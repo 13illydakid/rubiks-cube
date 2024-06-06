@@ -1,0 +1,55 @@
+{
+  "homepage": "https://github.com/13illydakid",
+  "name": "tesseract",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "14.17.3"
+  },
+  "dependencies": {
+    "bootstrap": "^4.5.3",
+    "dat.gui": "^0.7.9",
+    "easytimer.js": "^4.3.0",
+    "jquery": "^3.5.1",
+    "parcel": "^2.12.0",
+    "popper.js": "^1.16.1",
+    "rc-slider": "^8.7.1",
+    "react": "^17.0.1",
+    "react-bootstrap": "^2.1.1",
+    "react-bootstrap-sidebar": "0.0.1",
+    "react-dom": "^17.0.1",
+    "react-draggable": "^4.4.3",
+    "react-dropdown": "^1.9.0",
+    "react-lazyload": "^3.2.0",
+    "react-router-dom": "^6.2.1",
+    "react-scripts": "^3.4.4",
+    "reactjs-popup": "^2.0.5",
+    "serve": "^14.2.1",
+    "stats.js": "^0.17.0",
+    "three": "^0.125.0",
+    "three-orbitcontrols": "^2.110.3"
+  },
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
