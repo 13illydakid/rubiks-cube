@@ -3,9 +3,6 @@
   "name": "tesseract",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": "14.17.3"
-  },
   "dependencies": {
     "bootstrap": "^4.5.3",
     "dat.gui": "^0.7.9",
