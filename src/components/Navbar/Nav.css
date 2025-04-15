@@ -125,3 +125,23 @@
     border-color: #007bff!important;
     background-color: rgba(100, 100, 100,.5);
 }
+
+.cubesDropdown,.settingsDropDown{
+  display: none;
+}
+
+.cube-notations-container {
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transform: scale(0.8);
+}
+
+.notations-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}

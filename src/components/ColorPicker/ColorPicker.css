@@ -105,6 +105,13 @@
     float: right;
   }
 
+  .faceColorButtonContainer{
+    display: flex;
+    flex-direction: row-reverse;
+    top: 750px;
+    left: 700px;
+  }
+
   .colorButtonDiv{
     width:50%;
     height:25%;
@@ -116,7 +123,7 @@
     width:50%;
     height:33%;
     display: inline-block;
-    padding-bottom: 4px;
+    padding-bottom: 44px;
   }
 
   .colorPicker{
@@ -124,14 +131,14 @@
     height:100%;
     display: inline-block;
     border: 2px solid #007bff!important;
-    border-radius: .25rem;
+    border-radius: 2.25rem;
     transition: background-color .4s ease;
     pointer-events: auto;
   }
 
   .colorPickerExit{
     color: lightgrey;
-    
+
     background-color: rgba(211,211,211,.1);
     border-radius: .25rem;
     border: 2px solid lightgrey!important;

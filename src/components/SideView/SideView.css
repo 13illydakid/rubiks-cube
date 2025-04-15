@@ -11,7 +11,7 @@
     position:absolute;
     padding: 4px;
     bottom: 4px;
-    right: 0px;
+    left: 0px;
     height: 50%;
     width: 25vw;
     max-width: 400px;
@@ -39,13 +39,14 @@
 }
 
 .sideMenuWrapper{
-    min-width: 30vw;
-    max-width: 30vw;
-    min-height: 100%;
-    position: absolute;
-    bottom:0;
-    padding-top: 72px;
-    right:0;
+  display: flex;
+  flex-direction: column;
+  min-width: 30vw;
+  max-width: 30vw;
+  position: fixed;
+  bottom:20;
+  padding-top: 72px;
+  right:0;
 }
 
 .sideMenu{
@@ -53,24 +54,28 @@
   height:100%;
   position: relative;
   bottom:0px;
+  left: 140px;
 }
 
 .sideMenuBox{
-    padding: 4px;
-    height:30vh;
-    width:100%;
-    border: 2px solid rgb(52, 58, 64);
-    position: relative;
-    bottom: 30vh;
-  }
+  padding: 4px;
+  height:30vh;
+  width:100%;
+  border: 2px solid rgb(52, 58, 64);
+  position: relative;
+  bottom: 30vh;
+}
 
-  .sideMenuBox0{
+.sideMenuBox0{
+    /* display: grid;
+    grid-template-rows: auto;
+    grid-gap: 1px; */
     padding: 4px;
     height:60vh;
     width:100%;
     position: relative;
     bottom: -72px;
-    /* left: -1250px; */
+    left: -1050px;
 }
 
 .sideMenuBox1{
@@ -78,6 +83,7 @@
     width:100%;
     border-radius: .25rem;
     position: relative;
+    left: 140px;
 }
 
 .sideMenuBox2{
@@ -85,6 +91,7 @@
     height:49%;
     width:100%;
     border-radius: .25rem;
+    /* left: -100px; */
     bottom: 0;
 }
 
@@ -104,5 +111,5 @@
 
 .sideLimit{
     max-width:400px;
-    right:0px;
+    left:0px;
 }

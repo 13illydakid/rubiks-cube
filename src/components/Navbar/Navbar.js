@@ -3,6 +3,7 @@ import "./Nav.css";
 import { DropdownButton, Dropdown } from 'react-bootstrap'
 import 'react-dropdown/style.css'
 import Popup from "reactjs-popup";
+import notations from "../../assets/notations.png";
 
 const Navbar = props => {
   const navCubes = [];
@@ -21,9 +22,8 @@ const Navbar = props => {
     <nav className="navbar navbar-dark fixed-top">
       <ul className="nav nav-justified mr-auto">
         <li className="nav-item nav-fix-for-edge">
-          <p className="navbar-brand" style={{ color: "lightgray" }}><b>{props.title}</b></p>
+          <p className="navbar-brand" style={{ color: "lightgray", display: "none" }}><b>{props.title}</b></p>
 
-          {/*Open model here. Show bunch of settings. Pass changeSettings down to component to apply changes*/}
           <div className="settingsDropDown">
             <DropdownButton className="settings" aria-label="settings" id="settings" title={<i className='fa fa-cog'></i>}>
               <ul>
@@ -57,20 +57,23 @@ const Navbar = props => {
         </li>
       </ul>
       <div style={{ float: "right", height: "100%" }} >
-        <Popup trigger={<button id="infoBtn">Info</button>}>
+        <Popup trigger={<button id="infoBtn">Notations</button>}>
           {close => (
             <div style={{ zIndex: "100", width: "100%", height: "100%" }}>
               <div className="shadeBackground" style={{ backgroundColor: "black", zIndex: "101" }} onClick={close}></div>
               <div style={{ zIndex: "102", width: "max-content", margin: "auto", transform: "translateX(-50%)", padding: "8px" }} className="popupDiv">
-                <b style={{ fontSize: "2rem" }}>Instructions</b>
+                <b style={{ fontSize: "2rem" }}>Cube Notations</b>
                 <div className="close" id="closeBtn" onClick={close}>
                   &times;
                 </div>
                 <div style={{ backgroundColor: "rgba(0,0,0,.8)", height: "100%", marginTop: "0", color: "lightgrey", fontSize: "1rem", textAlign: "center", borderRadius: ".25rem", padding: "8px" }}>
                   <div style={{ paddingTop: "" }}>Click and drag anywhere not on the cube to rotate.</div>
+                  <div className="cube-notations-container">
+                    <img src={notations} alt="Cube Notations" className="notations-image" />
+                  </div>
                   <hr style={{ backgroundColor: "lightgray", width: "60%" }}></hr>
                   <div>Click and drag anywhere on the cube to make a move <br></br>or use the keyboard to make turns:</div>
-                  <div>
+                  <div style={{display: "none"}}>
                     <div style={{ width: "100%", textAlign: "center" }}>
                       <b style={{ color: "white", backgroundColor: "black" }}> F, </b><b style={{ color: "white", backgroundColor: "black" }}>f,</b>
                       <b style={{ color: "blue", backgroundColor: "black" }}> U, </b><b style={{ color: "blue", backgroundColor: "black" }}>u,</b>
@@ -82,19 +85,12 @@ const Navbar = props => {
                     </div>
                   </div>
                   <hr style={{ backgroundColor: "lightgray", width: "60%" }}></hr>
-                  <div style={{}}>
-                  <div style={{ marginBottom: "0", paddingBottom: "" }}>Links <br></br> <a target="#" href="https://www.github.com"><i className="fa fa-github" style={{ fontSize: "36px", marginRight: "10px" }}></i></a><a target="#" href="https://www.linkedin.com"><i className="fa fa-linkedin" style={{ fontSize: "36px" }}></i></a></div>
-                  <hr style={{ backgroundColor: "lightgrey" }}></hr>
-                  <div style={{ color: "white", backgroundColor: "", textAlign: "center" }}>
-                      algorithm visualizer
-                  </div>
-                  </div>
                 </div>
               </div>
             </div>
           )}
         </Popup> {" "}
-        <button id="fullscreenBtn" value="true">Fullscreen</button>
+        {/* <button id="fullscreenBtn" value="true">Fullscreen</button> */}
       </div>
     </nav>)
 };

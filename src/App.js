@@ -281,6 +281,19 @@ class App extends Component {
 
   changeColor = (color) => {
     this.setState({ colorPicked: color });
+    let tempObj = [...this.state.rubiksObject];
+    for (let i = 0; i < tempObj.length; i++) {
+      // tempObj[5] = color;
+      // tempObj[6] = color;
+      // tempObj[7] = color;
+      let tempCube = [...tempObj[i]];
+        tempCube[1] = color;
+        tempObj[i] = [...tempCube];
+        // i = tempObj.length;
+      }
+    this.setState({ rubiksObject: [...tempObj], isValidConfig: false, upDateCp: this.state.upDateCp + 1, cpErrors: [] }, () => {
+      this.reloadTurnedPieces('cp');
+    });
   }
 
   changeFaceColor = (pos, side, color) => {
@@ -289,6 +302,21 @@ class App extends Component {
       let tempCube = [...tempObj[i]];
       if (tempCube[6] === pos.x && tempCube[7] === pos.y && tempCube[8] === pos.z) {
         tempCube[side] = color;
+        tempObj[i] = [...tempCube];
+        i = tempObj.length;
+      }
+    }
+    this.setState({ rubiksObject: [...tempObj], isValidConfig: false, upDateCp: this.state.upDateCp + 1, cpErrors: [] }, () => {
+      this.reloadTurnedPieces('cp');
+    });
+  }
+
+  changeTopFaceColor = (pos, color) => {
+    let tempObj = [...this.state.rubiksObject];
+    for (let i = 0; i < tempObj.length; i++) {
+      let tempCube = [...tempObj[i]];
+      if (tempCube[6] === pos.x && tempCube[7] === pos.y && tempCube[8] === pos.z) {
+        tempCube[1] = color;
         tempObj[i] = [...tempCube];
         i = tempObj.length;
       }
@@ -307,7 +335,7 @@ class App extends Component {
   setColorPickedCube = () => {
     let rubiks = [...this.state.rubiksObject];
     let size = this.state.cubeDimension;
-    let generated = cube.generateSolved(size, size, size);
+    let generated = cube.generateSolved(size, size, size, "white");
     let newGenerated = [];
     let checked = [];
     let otherChecked = [];
@@ -442,7 +470,7 @@ class App extends Component {
   // Resets the cube and the move log
   reset = () => {
     let cD = this.state.cubeDimension;
-    let generated = cube.generateSolved(cD, cD, cD);
+    let generated = cube.generateSolved(cD, cD, cD, "white");
     let rubiksObject = generated.tempArr;
     this.setState({ rubiksObject, moveSet: [], moveLog: "", currentFunc: "None", solveState: -1, autoPlay: false, playOne: false, isVisible: false, hoverData: [], solveMoves: "", prevSet: [], cpErrors: [], activeMenu: "none" }, () => {
       this.reloadTurnedPieces('all');
@@ -754,7 +782,7 @@ class App extends Component {
 
     // Initial set up variables
     let cD = this.getSizeFromUrl();
-    let generated = cube.generateSolved(cD, cD, cD);
+    let generated = cube.generateSolved(cD, cD, cD, "white");
     let rubiksObject = generated.tempArr;
     let tempCubes = [];
 
@@ -772,11 +800,17 @@ class App extends Component {
     let loader = new THREE.TextureLoader().load('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW92XE-j1aJzRMI9kvvMZIf2VikZzzdEI87zl4rWgHMJBNJ9iw7A&s');
     let moveHintImage = new THREE.TextureLoader().load('https://cdn2.iconfinder.com/data/icons/communication-language/100/Up_Arrow-01-512.png');
 
-    const ambientLight = new THREE.AmbientLight(0xFFFFFF);
-    scene.add(ambientLight);
+    // const ambientLight = new THREE.AmbientLight(0xffffff);
+    const ambientLight = new THREE.AmbientLight(0x404040, 3);
     ambientLight.position.set(0, 0, 0);
+    scene.add(ambientLight);
 
+    // const pointLight = new THREE.PointLight(0x404040, 40);
+    // pointLight.position.set(2.6, 1.7, 3);
+    // scene.add(pointLight);
 
+    // const pLightHelper = new THREE.PointLightHelper(pointLight, 5);
+    // scene.add(pLightHelper);
 
     // const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.8);
     // scene.add(directionalLight);
@@ -785,12 +819,12 @@ class App extends Component {
     // const dLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
     // scene.add(dLightHelper);
 
-    const spotLight = new THREE.SpotLight(0xFFFFFF, 0.8);
-    scene.add(spotLight);
-    spotLight.position.set(30, 30, -20);
+    // const spotLight = new THREE.SpotLight(0xFFFFFF, 0.8);
+    // scene.add(spotLight);
+    // spotLight.position.set(30, 30, -20);
 
-    const sLightHelper = new THREE.SpotLightHelper(spotLight, 7);
-    scene.add(sLightHelper);
+    // const sLightHelper = new THREE.SpotLightHelper(spotLight, 7);
+    // scene.add(sLightHelper);
 
     let tanFOV = Math.tan(((Math.PI / 180) * camera.fov / 2));
     let windowHeight = window.innerHeight;
@@ -959,32 +993,103 @@ class App extends Component {
 
       // MeshBasicMaterial ** Basic material is not affected by light
       // const cubeMaterials = [
-      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][2] === "black" ? 0.1 : 0.45, color:rubiksObject[i][2], side: THREE.DoubleSide}), // red
-      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][4] === "black" ? 0.1 : 0.45, color:rubiksObject[i][4], side: THREE.DoubleSide}), // orange
-      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][3] === "black" ? 0.1 : 0.45, color:rubiksObject[i][3], side: THREE.DoubleSide}), // yellow
-      //   // new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][2] === "black" ? 0.1 : 0.45, color:rubiksObject[i][3], side: THREE.DoubleSide}), // yellow
-      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:0.45,}), // white
-      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][1] === "black" ? 0.1 : 0.45, color:rubiksObject[i][1], side: THREE.DoubleSide}), // blue
-      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][5] === "black" ? 0.1 : 0.45, color:rubiksObject[i][5], side: THREE.DoubleSide}), // green
+      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][2] === "black" ? 0.8 : 0.5, color:rubiksObject[i][2], side: THREE.DoubleSide}), // red
+      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][4] === "black" ? 0.8 : 0.5, color:rubiksObject[i][4], side: THREE.DoubleSide}), // orange
+      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][3] === "black" ? 0.8 : 0.5, color:rubiksObject[i][3], side: THREE.DoubleSide}), // yellow
+      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:0.5,}), // white
+      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][1] === "black" ? 0.8 : 0.5, color:rubiksObject[i][1], side: THREE.DoubleSide}), // blue
+      //   new THREE.MeshBasicMaterial({ map: loader ,transparent: true,opacity:rubiksObject[i][5] === "black" ? 0.8 : 0.5, color:rubiksObject[i][5], side: THREE.DoubleSide}), // green
       // ];
 
       // Mesh standard material
-      const cubeMaterials = [
-        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.05 : 0.45, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
-        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.05 : 0.45, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
-        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.05 : 0.45, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
-        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: 0.45, side: THREE.DoubleSide }), // white
-        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.05 : 0.45, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
-        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.05 : 0.45, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      // const cubeMaterials = [
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.5 : 0.5, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.5 : 0.5, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.5 : 0.5, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: 0.5, side: THREE.DoubleSide }), // white
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.5 : 0.5, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.5 : 0.5, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      // ];
+      // const cubeMaterials = [
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.7 : 0.7, color: rubiksObject[i][2], side: THREE.FrontSide }), // red
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.7 : 0.7, color: rubiksObject[i][4], side: THREE.FrontSide }), // orange
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.7 : 0.7, color: rubiksObject[i][3], side: THREE.FrontSide }), // yellow
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: 0.7, side: THREE.FrontSide }), // white
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.7 : 0.7, color: rubiksObject[i][1], side: THREE.FrontSide }), // blue
+      //   new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.7 : 0.7, color: rubiksObject[i][5], side: THREE.FrontSide }), // green
+      // ];
+      const cubeMaterialsTwo = [
+        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.7 : 0.7, color: rubiksObject[i][2], side: THREE.BackSide }), // red
+        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.7 : 0.7, color: rubiksObject[i][4], side: THREE.BackSide }), // orange
+        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.7 : 0.7, color: rubiksObject[i][3], side: THREE.BackSide }), // yellow
+        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: 0.7, side: THREE.BackSide }), // white
+        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.7 : 0.7, color: rubiksObject[i][1], side: THREE.BackSide }), // blue
+        new THREE.MeshStandardMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.7 : 0.7, color: rubiksObject[i][5], side: THREE.BackSide }), // green
       ];
+      // const cubeMaterials = [
+      //   new THREE.MeshLambertMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.7 : 0.7, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
+      //   new THREE.MeshLambertMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.7 : 0.7, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
+      //   new THREE.MeshLambertMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.7 : 0.7, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
+      //   new THREE.MeshLambertMaterial({ map: loader, transparent: true, opacity: 0.7, side: THREE.DoubleSide }), // white
+      //   new THREE.MeshLambertMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.7 : 0.7, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
+      //   new THREE.MeshLambertMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.7 : 0.7, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      // ];
+      // const cubeMaterials = [
+      //   new THREE.MeshMatcapMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.6 : 0.6, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
+      //   new THREE.MeshMatcapMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.6 : 0.6, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
+      //   new THREE.MeshMatcapMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.6 : 0.6, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
+      //   new THREE.MeshMatcapMaterial({ map: loader, transparent: true, opacity: 0.6, side: THREE.DoubleSide }), // white
+      //   new THREE.MeshMatcapMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.6 : 0.6, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
+      //   new THREE.MeshMatcapMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.6 : 0.6, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      // ];
+      const cubeMaterials = [
+        new THREE.MeshPhongMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.5 : 0.5, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
+        new THREE.MeshPhongMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.8 : 0.8, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
+        new THREE.MeshPhongMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.6 : 0.6, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
+        new THREE.MeshPhongMaterial({ map: loader, transparent: true, opacity: 0.5, side: THREE.DoubleSide }), // white
+        new THREE.MeshPhongMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.7 : 0.7, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
+        new THREE.MeshPhongMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.6 : 0.6, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      ];
+      // const cubeMaterials = [
+      //   new THREE.MeshPhysicalMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.6 : 0.6, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
+      //   new THREE.MeshPhysicalMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.6 : 0.6, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
+      //   new THREE.MeshPhysicalMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.6 : 0.6, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
+      //   new THREE.MeshPhysicalMaterial({ map: loader, transparent: true, opacity: 0.6, side: THREE.DoubleSide }), // white
+      //   new THREE.MeshPhysicalMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.6 : 0.6, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
+      //   new THREE.MeshPhysicalMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.6 : 0.6, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      // ];
+      // const cubeMaterials = [
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.6 : 0.6, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.6 : 0.6, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.6 : 0.6, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: 0.6, side: THREE.DoubleSide }), // white
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.6 : 0.6, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.6 : 0.6, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      // ];
+      // const cubeMaterials = [
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][2] === "black" ? 0.5 : 1.0, color: rubiksObject[i][2], side: THREE.DoubleSide }), // red
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][4] === "black" ? 0.5 : 1.0, color: rubiksObject[i][4], side: THREE.DoubleSide }), // orange
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][3] === "black" ? 0.5 : 1.0, color: rubiksObject[i][3], side: THREE.DoubleSide }), // yellow
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: 1.0, side: THREE.DoubleSide }), // white
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][1] === "black" ? 0.5 : 1.0, color: rubiksObject[i][1], side: THREE.DoubleSide }), // blue
+      //   new THREE.MeshToonMaterial({ map: loader, transparent: true, opacity: rubiksObject[i][5] === "black" ? 0.5 : 1.0, color: rubiksObject[i][5], side: THREE.DoubleSide }), // green
+      // ];
 
       // Add the new cube to temp cubes
       tempCubes[i] = new THREE.Mesh(cubeGeometry, cubeMaterials);
+      // const geometry = new THREE.BoxGeometry();
+      // tempCubes[i] = new THREE.Mesh(geometry, cubeMaterials);
       //group.add( tempCubes[i] );
       // position piece based off memory cube
       tempCubes[i].translateX(cubeX);
       tempCubes[i].translateY(cubeY);
       tempCubes[i].translateZ(cubeZ);
+
+      let tempTempCubes = [];
+      tempTempCubes[i] = new THREE.Mesh(cubeGeometry, cubeMaterialsTwo);
+      tempTempCubes[i].translateX(cubeX);
+      tempTempCubes[i].translateY(cubeY);
+      tempTempCubes[i].translateZ(cubeZ);
     }
 
     // Translate cube so center of cube is 0,0,0
@@ -997,7 +1102,7 @@ class App extends Component {
     controls.enabled = true;
     controls.enableDamping = true;   //damping
     controls.dampingFactor = 0.15;   //damping inertia
-    controls.enableZoom = true;      //Zooming
+    controls.enableZoom = false;      //Zooming
     controls.autoRotate = false;     //Enable auto rotation
     controls.minDistance = (2 + cD);
     controls.maxDistance = (2 + cD) + 20;
@@ -1025,9 +1130,12 @@ class App extends Component {
     this.setState({
       cubes: tempCubes,
       cubeDimension: cD,
-      cameraZ: (2 + cD),
-      cameraX: (2 + cD),
-      cameraY: -(2 + cD),
+      cameraZ: 5,
+      cameraX: 2.5,
+      cameraY: -10,
+      // cameraZ: (2 + cD),
+      // cameraX: (2 + cD),
+      // cameraY: -(2 + cD),
       rubiksObject,
       middles: generated.middles,
       edges: generated.edges,
@@ -1327,7 +1435,7 @@ class App extends Component {
       <div className="App" style={{ width: "max-content" }}>
 
         <Navbar
-          title="Tesseract"
+          title="ZERO"
           changeSettings={this.changeSettings.bind(this)}
           isLocal={this.getSizeFromUrl(true)}
           state={this.state}
@@ -1398,6 +1506,8 @@ class App extends Component {
               : ""
             }
           </div>
+          <button style={{ position: "relative", left: "-700px", color: "black" }} type="button" onClick={this.changeFaceColor} >button</button>
+          <button style={{ position: "relative", left: "-650px", color: "red" }} type="button" onClick={this.changeTopFaceColor} >button</button>
         </div>
 
       </div>

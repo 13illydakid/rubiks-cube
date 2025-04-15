@@ -48,3 +48,124 @@
 .redoUndo:active{
   background-color: rgba(0,0,255,.25);
 }
+
+body {
+  background-color: black;
+}
+
+/* Index.html styling migration */
+/*
+body {
+  background-color: black;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+      -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+.nav-fix-for-edge{
+  display:"flex";
+}
+
+button:focus {outline:0;}
+
+.redoUndo{
+  -webkit-background-size: 90% 90%;
+    -moz-background-size: 90% 90%;
+      -o-background-size: 90% 90%;
+          background-size: 90% 90%;
+}
+
+#closeBtn{
+  color: lightgray;
+}
+
+.popup-content{
+  border: none!important;
+  background: transparent!important;
+  box-shadow: none!important;
+}
+
+.popup-arrow {
+  display: none!important;
+}
+
+.popupDiv {
+  position: fixed;
+  top:10%;
+  left:50%;
+  width:75%;
+  margin-left:-37.5%;
+  background-color: rgba(0,0,100,.8);
+  border-radius: .25rem;
+  border: 2px solid #007bff;
+  color: lightgray;
+}
+
+.popupDiv p{
+  text-align: left;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.shadeBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #dddddd;
+  opacity: .5;
+}
+@media (max-width: 640px){
+  #fullscreenBtn {
+    display: none;
+  }
+}
+@media (max-width: 399px){
+  #fullscreenBtn {
+    display: none;
+  }
+}
+@media (max-width:420px) {
+  .popupDiv{
+    width:90%!important;
+  }
+  #infoBtn{
+    padding-left: 10px!important;
+    padding-right: 10px!important;
+  }
+  .navbar{
+    padding: 1rem .5rem!important;
+  }
+  #divInfo{
+    display: none;
+  }
+  #settings{
+    display: none;
+  }
+}
+
+#fullscreenBtn,#triggerBtn,#infoBtn{
+  font-size: 1rem;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.canvas{
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background: radial-gradient(#343a40, #000000);
+}
+#moveInput{
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+      -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+  min-width: max-content;
+} */
