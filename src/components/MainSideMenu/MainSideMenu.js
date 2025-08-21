@@ -17,6 +17,19 @@ const MainSideMenu = props => {
     }
   }
 
+  // New function to set the top face color and update orientation
+  function setTopFaceColor() {
+    if (props.state.currentFunc === "None") {
+      // Open color picker for top face selection
+      props.setState({ activeMenu: "SetTopFaceColor", isValidConfig: true });
+      // You may want to show a UI for color selection here
+      // After color is picked, update the cube orientation and algorithms
+      if (props.onSetTopFaceColor) {
+        props.onSetTopFaceColor();
+      }
+    }
+  }
+
   function solver() {
     if (props.state.currentFunc === "None")
       props.setState({ activeMenu: "Solver" }, props.beginSolve());
@@ -45,7 +58,7 @@ const MainSideMenu = props => {
     <div className="sideMenuWrapper sideLimit">
       {props.state.cubeDimension <= 100 ? <MainSideMenuButton
         name="Top Face"
-        onClick={colorPicker}
+        onClick={setTopFaceColor}
       /> : []}
       {props.state.cubeDimension <= 100 ?
         <MainSideMenuButton

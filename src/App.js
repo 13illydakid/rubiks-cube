@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import OrientationPicker from "./components/OrientationPicker";
+import * as Orientation from "./components/Orientation";
+import TopFaceColorPicker from "./components/ColorPicker/TopFaceColorPicker";
 import Navbar from "./components/Navbar/Navbar";
 import Speeds from "./components/Speeds/Speeds";
 import MoveInput from "./components/MoveInput";
@@ -29,6 +32,30 @@ import ColorPickerUIFunctions from "./components/ColorPicker/ColorPickerUIFuncti
  */
 
 class App extends Component {
+  handleSetOrientation = () => {
+    this.setState({ activeMenu: "SetOrientation" });
+  }
+
+  handlePickOrientation = (topColor, frontColor) => {
+    // Use Orientation.js mapping to get correct face colors
+    const topKey = `${topColor.charAt(0).toUpperCase()}${topColor.slice(1)}Top`;
+    const orientationObj = Orientation[topKey];
+    const topFaceColor = orientationObj ? orientationObj[frontColor] : null;
+    if (!topFaceColor) {
+      alert("Invalid orientation selection.");
+      return;
+    }
+    // Generate solved cube with correct face colors
+    const cD = this.state.cubeDimension;
+    const generated = cube.generateSolved(cD, cD, cD, topFaceColor);
+    this.setState({
+      topFaceColor: topColor,
+      frontFaceColor: frontColor,
+      orientationFaces: topFaceColor,
+      rubiksObject: generated.tempArr,
+      activeMenu: "",
+    });
+  }
   state = {
     cubes: [],           // Contains visual cube
     rubiksObject: [],    // Contains memory cube
@@ -287,10 +314,10 @@ class App extends Component {
       // tempObj[6] = color;
       // tempObj[7] = color;
       let tempCube = [...tempObj[i]];
-        tempCube[1] = color;
-        tempObj[i] = [...tempCube];
-        // i = tempObj.length;
-      }
+      tempCube[1] = color;
+      tempObj[i] = [...tempCube];
+      // i = tempObj.length;
+    }
     this.setState({ rubiksObject: [...tempObj], isValidConfig: false, upDateCp: this.state.upDateCp + 1, cpErrors: [] }, () => {
       this.reloadTurnedPieces('cp');
     });
@@ -1496,7 +1523,25 @@ class App extends Component {
           playOne={this.playOne}
           rewindOne={this.rewindSolve}
           reload={this.reloadTurnedPieces}
+
+          // Orientation
+          onSetOrientation={this.handleSetOrientation}
         />
+        {/* Show OrientationPicker when activeMenu is SetOrientation */}
+        {this.state.activeMenu === "SetOrientation" && (
+          <OrientationPicker
+            onSetOrientation={this.handlePickOrientation}
+            currentTop={this.state.topFaceColor}
+            currentFront={this.state.topFaceColor}
+          />
+        )}
+        {/* Show TopFaceColorPicker when activeMenu is SetTopFaceColor */}
+        {this.state.activeMenu === "SetTopFaceColor" && (
+          <TopFaceColorPicker
+            onPick={this.handlePickTopFaceColor}
+            currentColor={this.state.topFaceColor || this.state.colorPicked}
+          />
+        )}
 
         <div style={{ width: "100%", position: "absolute", bottom: "85px", margin: "auto", display: "flex" }}>
           <div style={{ margin: "auto", display: "inline-flex", }}>

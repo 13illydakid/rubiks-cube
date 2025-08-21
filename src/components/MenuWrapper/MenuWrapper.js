@@ -3,7 +3,7 @@ import MobileView from "../MobileView/MobileView";
 import View from "../View";
 import SideView from "../SideView/SideView";
 import MainSideMenu from "../MainSideMenu/MainSideMenu";
-import FaceColors from "../FaceColors/FaceColors";
+import TopFaceColor from "../FaceColors/TopFaceColor";
 class Menu extends Component {
   // eslint-disable-next-line no-useless-constructor
   constructor(props) {
@@ -43,11 +43,10 @@ class Menu extends Component {
   render() {
     const props = this.props;
     return (window.innerWidth > 900 && window.innerHeight > 580) ?
-      // <MobileView {...props} />
       <>
         <SideView {...props} />
-        {/* <MainSideMenu {...props} /> */}
-        <FaceColors {...props} />
+        <MainSideMenu {...props} />
+        <TopFaceColor {...props} />
       </>
       : window.innerWidth > 600 ?
         <View {...props} />

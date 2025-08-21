@@ -112,9 +112,9 @@
 }
 
 #closeBtn{
-    border-radius:50%;
-    -moz-border-radius:50%;
-    -webkit-border-radius:50%;
+  -moz-border-radius:50%;
+  -webkit-border-radius:50%;
+  border-radius:50%;
     width: 2rem;
     height: 2rem;
     border: 2px solid #007bff;

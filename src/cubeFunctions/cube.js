@@ -3,7 +3,7 @@ import * as THREE from "three";
 // Functions to generate/manipulate cube
 const cube = {
   // Generates the inital solved state of rubiksObject
-  generateSolved: function (_x, _y, _z, topFaceColor = null, frontFaceColor = null) {
+  generateSolved: function (_x, _y, _z, topFaceColor = null) {
     const size = _z;
     const half = Math.floor(size / 2);
     const tempArr = [];
@@ -33,82 +33,82 @@ const cube = {
           let side3 = "black";
           let side4 = "black";
           let side5 = "black";
-          let edgeType = null;
-          let middleType = null;
-          // if (i === _x - 1) side2 = "red"; // green
-          // else if (i === 0) side4 = "orange"; // blue
-          // if (j === _y - 1) side3 = "yellow"; // orange
-          // else if (j === 0) side0 = "white"; // red
-          // if (k === _z - 1) side1 = "blue"; // yellow
-          // else if (k === 0) side5 = "green"; // white
-          // if (i === _x - 1) side2 = "green"; // green
-          // else if (i === 0) side4 = "blue"; // blue
-          // if (j === _y - 1) side3 = "orange"; // orange
-          // else if (j === 0) side0 = "red"; // red
-          // if (k === _z - 1) side1 = "yellow"; // yellow
-          // else if (k === 0) side5 = "white"; // white
 
+          // If faceColors is provided, use it for each face
+          // if (faceColors && faceColors.length === 6) {
+          //   side0 = faceColors[0]; // top
+          //   side1 = faceColors[1]; // front
+          //   side2 = faceColors[2]; // left
+          //   side3 = faceColors[3]; // right
+          //   side4 = faceColors[4]; // back
+          //   side5 = faceColors[5]; // bottom
+          // } else {
+            let edgeType = null;
+            let middleType = null;
+            // if (i === _x - 1) side2 = "red"; // green
+            // else if (i === 0) side4 = "orange"; // blue
+            // if (j === _y - 1) side3 = "yellow"; // orange
+            // else if (j === 0) side0 = "white"; // red
+            // if (k === _z - 1) side1 = "blue"; // yellow
+            // else if (k === 0) side5 = "green"; // white
+            // if (i === _x - 1) side2 = "green"; // green
+            // else if (i === 0) side4 = "blue"; // blue
+            // if (j === _y - 1) side3 = "orange"; // orange
+            // else if (j === 0) side0 = "red"; // red
+            // if (k === _z - 1) side1 = "yellow"; // yellow
+            // else if (k === 0) side5 = "white"; // white
+
+            // ...existing code for switch (topFaceColor)
+          // }
           switch (topFaceColor) {
-            case "yellow":
-              if (i === _x - 1) side2 = "green";
-              else if (i === 0) side4 = "blue";
-              if (j === _y - 1) side3 = "orange";
-              else if (j === 0) side0 = "red";
-              if (k === _z - 1) side1 = "yellow";
-              else if (k === 0) side5 = "white";
-              break;
-            case "green":
-              if (i === _x - 1) side2 = "white";
-              else if (i === 0) side4 = "yellow";
-              if (j === _y - 1) side3 = "orange";
-              else if (j === 0) side0 = "red";
-              if (k === _z - 1) side1 = "green";
-              else if (k === 0) side5 = "blue";
-              break;
-            case "blue":
-                if (i === _x - 1) side2 = "yellow";
-                else if (i === 0) side4 = "white";
-                if (j === _y - 1) side3 = "orange";
-                else if (j === 0) side0 = "red";
-                if (k === _z - 1) side1 = "blue";
-                else if (k === 0) side5 = "green";
-                break;
+            // case "yellow":
+            //   if (i === _x - 1) side2 = "green";
+            //   else if (i === 0) side4 = "blue";
+            //   if (j === _y - 1) side3 = "orange";
+            //   else if (j === 0) side0 = "red";
+            //   if (k === _z - 1) side1 = "yellow";
+            //   else if (k === 0) side5 = "white";
+            //   break;
+            // case "green":
+            //   if (i === _x - 1) side2 = "white";
+            //   else if (i === 0) side4 = "yellow";
+            //   if (j === _y - 1) side3 = "orange";
+            //   else if (j === 0) side0 = "red";
+            //   if (k === _z - 1) side1 = "green";
+            //   else if (k === 0) side5 = "blue";
+            //   break;
+            // case "blue":
+            //     if (i === _x - 1) side2 = "yellow";
+            //     else if (i === 0) side4 = "white";
+            //     if (j === _y - 1) side3 = "orange";
+            //     else if (j === 0) side0 = "red";
+            //     if (k === _z - 1) side1 = "blue";
+            //     else if (k === 0) side5 = "green";
+            //     break;
             //   case "orange":
-            //   if (i === _x - 1) side2 =
-            //   "green";
-            //   else if (i === 0) side4 =
-            //   "blue";
-            //   if (j === _y - 1) side3 =
-            //   "orange";
-            //   else if (j === 0) side0 =
-            //   "red";
-            //   if (k === _z - 1) side1 =
-            //   "yellow";
-            //   else if (k === 0) side5 =
-            //   "white";
+            //   if (i === _x - 1) side2 = "green";
+            //   else if (i === 0) side4 = "blue";
+            //   if (j === _y - 1) side3 = "orange";
+            //   else if (j === 0) side0 = "red";
+            //   if (k === _z - 1) side1 = "yellow";
+            //   else if (k === 0) side5 = "white";
             //   break;
             // case "red":
-              if (i === _x - 1) side2 =
-              "green";
-              else if (i === 0) side4 =
-              "blue";
-              if (j === _y - 1) side3 =
-              "orange";
-              else if (j === 0) side0 =
-              "red";
-              if (k === _z - 1) side1 =
-              "yellow";
-              else if (k === 0) side5 =
-              "white";
-              break;
-            case "white":
-              if (i === _x - 1) side2 = "blue";
-              else if (i === 0) side4 = "green";
-              if (j === _y - 1) side3 = "orange";
-              else if (j === 0) side0 = "red";
-              if (k === _z - 1) side1 = "white";
-              else if (k === 0) side5 = "yellow";
-              break;
+            //   if (i === _x - 1) side2 = "green";
+            //   else if (i === 0) side4 = "blue";
+            //   if (j === _y - 1) side3 = "orange";
+            //   else if (j === 0) side0 = "red";
+            //   if (k === _z - 1) side1 = "yellow";
+            //   else if (k === 0) side5 = "white";
+            //   break;
+            // case "white":
+            //   if (i === _x - 1) side2 = "blue";
+            //   else if (i === 0) side4 = "green";
+            //   if (j === _y - 1) side3 = "orange";
+            //   else if (j === 0) side0 = "red";
+            //   if (k === _z - 1) side1 = "white";
+            //   else if (k === 0) side5 = "yellow";
+            //   break;
             default:
               if (i === _x - 1) side2 = "green";
               else if (i === 0) side4 = "blue";
@@ -116,6 +116,12 @@ const cube = {
               else if (j === 0) side0 = "red";
               if (k === _z - 1) side1 = "yellow";
               else if (k === 0) side5 = "white";
+              // if (i === _x - 1) side2 = "red";
+              // else if (i === 0) side4 = "orange";
+              // if (j === _y - 1) side3 = "yellow";
+              // else if (j === 0) side0 = "white";
+              // if (k === _z - 1) side1 = "blue";
+              // else if (k === 0) side5 = "green";
           }
 
           let tempCount = 0;

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Row, Col } from "react-bootstrap";
 import ColorButton from "../ColorPicker/ColorButton";
 import "../ColorPicker/ColorPicker.css";
-import "./FaceColors.css";
+import "./TopFaceColor.css";
 
-const FaceColors = (props) => {
+const TopFaceColor = (props) => {
   const [selectedColor, setSelectedColor] = useState(null);
 
   const colors = ["white", "blue", "red", "yellow", "orange", "green"];
@@ -34,4 +34,4 @@ const FaceColors = (props) => {
   )
 }
 
-export default FaceColors;
+export default TopFaceColor;
