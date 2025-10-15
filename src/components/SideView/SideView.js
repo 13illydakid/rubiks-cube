@@ -4,8 +4,8 @@ import ColorPicker from "../ColorPicker/SideColorPicker";
 import SideSolverUI from "../SolverUI/SideSolverUI";
 import SideSolverControls from "../SolverUI/SideSolverControls";
 import SideColorPickerController from "../ColorPicker/SideColorPickerController";
-import MainSideMenu from "../MainSideMenu/MainSideMenu";
 import "./SideView.css";
+import View from "../View";
 
 
 class SideView extends Component {
@@ -199,7 +199,7 @@ class SideView extends Component {
         activeMenuExit = algoLeaveButton;
         break;
       default:
-        activeMenu = <MainSideMenu {...this.props} />;
+        activeMenu = <View {...this.props} />;
         activeMenuBottom = "";
     }
 
@@ -207,7 +207,7 @@ class SideView extends Component {
     //console.log("hi")
     return (
       [<div className="sideMenuWrapper sideLimit" key="sideMenuWrapper" style={{ pointerEvents: "none" }}>
-        <MainSideMenu {...this.props} />
+        <View {...this.props} />
         {activeMenu}
       </div>,
       <div className="bottomMenuWrapper" key="bottomMenuWrapper" style={{ pointerEvents: "none" }}>

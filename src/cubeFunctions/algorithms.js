@@ -179,7 +179,7 @@ let generalizedBundle = (name, moveSet, moveSet2) => {
       });
     }
   }
-  console.log("!!!!!!!!!!!!!!!!!");
+  
   return sets;
 }
 

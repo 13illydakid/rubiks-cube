@@ -11,43 +11,43 @@ const cubeSyntaxTranslation = {
 };
 
 export const YellowTop = {
-  "red": [ "yellow", "red", "blue", "green", "orange", "white" ],
-  "blue": [ "yellow", "blue", "orange", "red", "green", "white" ],
-  "orange": [ "yellow", "orange", "green", "blue", "red", "white" ],
-  "green": [ "yellow", "green", "red", "orange", "blue", "white" ]
+  "red": [ "green", "blue", "orange", "red", "yellow", "white" ],
+  "blue": [ "red", "orange", "green", "blue", "yellow", "white" ],
+  "orange": [ "blue", "green", "red", "orange", "yellow", "white" ],
+  "green": [ "orange", "red", "blue", "green", "yellow", "white" ]
 }
 
 export const RedTop = {
-  "yellow": [ "red", "yellow", "green", "blue", "white", "orange", ],
-  "green": [ "red", "green", "white", "yellow", "blue", "orange", ],
-  "white": [ "red", "white", "blue", "green", "yellow", "orange", ],
-  "blue": [ "red", "blue", "yellow", "white", "green", "orange", ]
+  "yellow": [ "blue", "green", "white", "yellow", "red", "orange" ],
+  "green": [ "yellow", "white", "blue", "green", "red", "orange" ],
+  "white": [ "green", "blue", "yellow", "white", "red", "orange" ],
+  "blue": [ "white", "yellow", "green", "blue", "red", "orange" ]
 }
 
 export const BlueTop = {
-  "red": [ "blue", "red", "white", "yellow", "orange", "green", ],
-  "white": [ "blue", "white", "orange", "red", "yellow", "green", ],
-  "orange": [ "blue", "orange", "yellow", "white", "red", "green", ],
-  "yellow": [ "blue", "yellow", "red", "orange", "white", "green", ]
+  "red": [ "yellow", "white", "orange", "red", "blue", "green" ],
+  "white": [ "red", "orange", "yellow", "white", "blue", "green" ],
+  "orange": [ "white", "yellow", "red", "orange", "blue", "green" ],
+  "yellow": [ "orange", "red", "white", "yellow", "blue", "green" ]
 }
 
 export const OrangeTop = {
-  "yellow": [ "orange", "yellow", "blue", "green", "white", "red", ],
-  "blue": [ "orange", "blue", "white", "yellow", "green", "red", ],
-  "white": [ "orange", "white", "green", "blue", "yellow", "red", ],
-  "green": [ "orange", "green", "yellow", "white", "blue", "red", ]
+  "yellow": [ "green", "blue", "white", "yellow", "orange", "red" ],
+  "blue": [ "yellow", "white", "green", "blue", "orange", "red" ],
+  "white": [ "blue", "green", "yellow", "white", "orange", "red" ],
+  "green": [ "white", "yellow", "blue", "green", "orange", "red" ]
 }
 
 export const GreenTop = {
-  "red": [ "green", "red", "yellow", "white", "orange", "blue", ],
-  "yellow": [ "green", "yellow", "orange", "red", "white", "blue", ],
-  "orange": [ "green", "orange", "white", "yellow", "red", "blue", ],
-  "white": [ "green", "white", "red", "orange", "yellow", "blue", ]
+  "red": [ "white", "yellow", "orange", "red", "green", "blue" ],
+  "yellow": [ "red", "orange", "white", "yellow", "green", "blue" ],
+  "orange": [ "yellow", "white", "red", "orange", "green", "blue" ],
+  "white": [ "orange", "red", "yellow", "white", "green", "blue" ]
 }
 
 export const WhiteTop = {
-  "red": [ "white", "red", "green", "blue", "orange", "yellow", ],
-  "green": [ "white", "green", "orange", "red", "blue", "yellow", ],
-  "orange": [ "white", "orange", "blue", "green", "red", "yellow", ],
-  "blue": [ "white", "blue", "red", "orange", "green", "yellow", ]
+  "red": [ "blue", "green", "orange", "red", "white", "yellow" ],
+  "green": [ "red", "orange", "blue", "green", "white", "yellow" ],
+  "orange": [ "green", "blue", "red", "orange", "white", "yellow" ],
+  "blue": [ "orange", "red", "green", "blue", "white", "yellow" ]
 }

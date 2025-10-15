@@ -8,9 +8,10 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 5px;
-    padding-top:0px;
-    padding-bottom:0px;
-    background-color: red;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgb(57, 86, 107);
+    border-radius: 5%;
 }
 
 .leftButton{

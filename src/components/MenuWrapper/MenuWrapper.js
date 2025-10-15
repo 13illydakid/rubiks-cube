@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import MobileView from "../MobileView/MobileView";
 import View from "../View";
 import SideView from "../SideView/SideView";
-import MainSideMenu from "../MainSideMenu/MainSideMenu";
 import TopFaceColor from "../FaceColors/TopFaceColor";
 class Menu extends Component {
   // eslint-disable-next-line no-useless-constructor
@@ -45,13 +44,12 @@ class Menu extends Component {
     return (window.innerWidth > 900 && window.innerHeight > 580) ?
       <>
         <SideView {...props} />
-        <MainSideMenu {...props} />
-        <TopFaceColor {...props} />
+        {/* <TopFaceColor {...props} /> */}
       </>
       : window.innerWidth > 600 ?
-        <View {...props} />
-        :
-        <MobileView {...props} />
+      <View {...props} />
+      :
+      <MobileView {...props} />
       ;
   }
 }

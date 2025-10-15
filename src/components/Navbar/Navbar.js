@@ -1,15 +1,16 @@
 import React from "react";
 import "./Nav.css";
 import { DropdownButton, Dropdown } from 'react-bootstrap'
-import 'react-dropdown/style.css'
 import Popup from "reactjs-popup";
 import notations from "../../assets/notations.png";
+import { Link } from "react-router-dom";
+import logo from "../../assets/favicon.png";
 
 const Navbar = props => {
   const navCubes = [];
 
-  function reloadPage(){
-    setTimeout(function(){
+  function reloadPage() {
+    setTimeout(function () {
       window.location.reload();
     }, 50);
   }
@@ -20,33 +21,25 @@ const Navbar = props => {
   }
   return (
     <nav className="navbar navbar-dark fixed-top">
-      <ul className="nav nav-justified mr-auto">
+      {/* <ul className="nav nav-justified mr-auto">
         <li className="nav-item nav-fix-for-edge">
           <p className="navbar-brand" style={{ color: "lightgray", display: "none" }}><b>{props.title}</b></p>
-
           <div className="settingsDropDown">
             <DropdownButton className="settings" aria-label="settings" id="settings" title={<i className='fa fa-cog'></i>}>
               <ul>
-
                 <li className="settingsDropDownItem">
                   <div className="checkbox-inline">
                       <input type="checkbox" data-toggle="toggle" onClick={() => props.changeSettings('displayMoveInput')}></input>
                   </div>
               Move Input
             </li>
-
                 <li className="settingsDropDownItem" onClick={() => props.changeSettings('displayHints')}>
-
-
                   <div className="checkbox-inline">
                       <input type="checkbox" defaultChecked data-toggle="toggle" onClick={() => props.changeSettings('displayHints')}></input>
                   </div>
               Move Hints
-
             </li>
-
               </ul>
-
             </DropdownButton>
           </div>
           <div className="cubesDropdown">
@@ -55,7 +48,13 @@ const Navbar = props => {
             </DropdownButton>
           </div>
         </li>
-      </ul>
+      </ul> */}
+
+      <div className="logo" >
+        <Link to="/" >
+          <img src={logo} alt="Logo" />
+        </Link>
+      </div>
       <div style={{ float: "right", height: "100%" }} >
         <Popup trigger={<button id="infoBtn">Notations</button>}>
           {close => (
@@ -73,7 +72,7 @@ const Navbar = props => {
                   </div>
                   <hr style={{ backgroundColor: "lightgray", width: "60%" }}></hr>
                   <div>Click and drag anywhere on the cube to make a move <br></br>or use the keyboard to make turns:</div>
-                  <div style={{display: "none"}}>
+                  <div style={{ display: "none" }}>
                     <div style={{ width: "100%", textAlign: "center" }}>
                       <b style={{ color: "white", backgroundColor: "black" }}> F, </b><b style={{ color: "white", backgroundColor: "black" }}>f,</b>
                       <b style={{ color: "blue", backgroundColor: "black" }}> U, </b><b style={{ color: "blue", backgroundColor: "black" }}>u,</b>

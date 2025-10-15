@@ -1,15 +1,95 @@
 import * as THREE from "three";
 
+const cubeSyntaxTranslation = {
+  side2: "right",  // 3
+  side4: "left",   // 2
+  side3: "back",   // 4
+  side0: "front",  // 1
+  side1: "top",    // 0
+  side5: "bottom", // 5
+};
+
+const YellowTop = {
+  "red": ["green", "blue", "orange", "red", "yellow", "white"],
+  "blue": ["red", "orange", "green", "blue", "yellow", "white"],
+  "orange": ["blue", "green", "red", "orange", "yellow", "white"],
+  "green": ["orange", "red", "blue", "green", "yellow", "white"]
+}
+
+const RedTop = {
+  "yellow": ["blue", "green", "white", "yellow", "red", "orange"],
+  "green": ["yellow", "white", "blue", "green", "red", "orange"],
+  "white": ["green", "blue", "yellow", "white", "red", "orange"],
+  "blue": ["white", "yellow", "green", "blue", "red", "orange"]
+}
+
+const BlueTop = {
+  "red": ["yellow", "white", "orange", "red", "blue", "green"],
+  "white": ["red", "orange", "yellow", "white", "blue", "green"],
+  "orange": ["white", "yellow", "red", "orange", "blue", "green"],
+  "yellow": ["orange", "red", "white", "yellow", "blue", "green"]
+}
+
+const OrangeTop = {
+  "yellow": ["green", "blue", "white", "yellow", "orange", "red"],
+  "blue": ["yellow", "white", "green", "blue", "orange", "red"],
+  "white": ["blue", "green", "yellow", "white", "orange", "red"],
+  "green": ["white", "yellow", "blue", "green", "orange", "red"]
+}
+
+const GreenTop = {
+  "red": ["white", "yellow", "orange", "red", "green", "blue"],
+  "yellow": ["red", "orange", "white", "yellow", "green", "blue"],
+  "orange": ["yellow", "white", "red", "orange", "green", "blue"],
+  "white": ["orange", "red", "yellow", "white", "green", "blue"]
+}
+
+const WhiteTop = {
+  "red": ["blue", "green", "orange", "red", "white", "yellow"],
+  "green": ["red", "orange", "blue", "green", "white", "yellow"],
+  "orange": ["green", "blue", "red", "orange", "white", "yellow"],
+  "blue": ["orange", "red", "green", "blue", "white", "yellow"]
+}
+
 // Functions to generate/manipulate cube
 const cube = {
   // Generates the inital solved state of rubiksObject
-  generateSolved: function (_x, _y, _z, topFaceColor = null) {
+  generateSolved: function (_x, _y, _z, topFaceColor = null, frontFaceColor = null) {
     const size = _z;
     const half = Math.floor(size / 2);
     const tempArr = [];
     const middles = [];
     const edges = [];
     const corners = [];
+    // Support two ways of specifying orientation:
+    // 1) An array [top, front, left, right, back, bottom]
+    // 2) Two strings: topFaceColor and frontFaceColor
+    let orientationFaces = YellowTop["red"];
+    if (typeof topFaceColor === "string" && typeof frontFaceColor === "string") {
+      switch (topFaceColor) {
+        case "yellow":
+          orientationFaces = YellowTop[frontFaceColor];
+          break;
+        case "red":
+          orientationFaces = RedTop[frontFaceColor];
+          break;
+        case "blue":
+          orientationFaces = BlueTop[frontFaceColor];
+          break;
+        case "orange":
+          orientationFaces = OrangeTop[frontFaceColor];
+          break;
+        case "green":
+          orientationFaces = GreenTop[frontFaceColor];
+          break;
+        case "white":
+          orientationFaces = WhiteTop[frontFaceColor];
+          break;
+        default:
+          orientationFaces = YellowTop["red"];
+          break;
+      }
+    }
     const tempMiddles = [
       [], // white
       [], // yellow
@@ -34,94 +114,19 @@ const cube = {
           let side4 = "black";
           let side5 = "black";
 
-          // If faceColors is provided, use it for each face
-          // if (faceColors && faceColors.length === 6) {
-          //   side0 = faceColors[0]; // top
-          //   side1 = faceColors[1]; // front
-          //   side2 = faceColors[2]; // left
-          //   side3 = faceColors[3]; // right
-          //   side4 = faceColors[4]; // back
-          //   side5 = faceColors[5]; // bottom
-          // } else {
-            let edgeType = null;
-            let middleType = null;
-            // if (i === _x - 1) side2 = "red"; // green
-            // else if (i === 0) side4 = "orange"; // blue
-            // if (j === _y - 1) side3 = "yellow"; // orange
-            // else if (j === 0) side0 = "white"; // red
-            // if (k === _z - 1) side1 = "blue"; // yellow
-            // else if (k === 0) side5 = "green"; // white
-            // if (i === _x - 1) side2 = "green"; // green
-            // else if (i === 0) side4 = "blue"; // blue
-            // if (j === _y - 1) side3 = "orange"; // orange
-            // else if (j === 0) side0 = "red"; // red
-            // if (k === _z - 1) side1 = "yellow"; // yellow
-            // else if (k === 0) side5 = "white"; // white
+          let edgeType = null;
+          let middleType = null;
 
-            // ...existing code for switch (topFaceColor)
-          // }
-          switch (topFaceColor) {
-            // case "yellow":
-            //   if (i === _x - 1) side2 = "green";
-            //   else if (i === 0) side4 = "blue";
-            //   if (j === _y - 1) side3 = "orange";
-            //   else if (j === 0) side0 = "red";
-            //   if (k === _z - 1) side1 = "yellow";
-            //   else if (k === 0) side5 = "white";
-            //   break;
-            // case "green":
-            //   if (i === _x - 1) side2 = "white";
-            //   else if (i === 0) side4 = "yellow";
-            //   if (j === _y - 1) side3 = "orange";
-            //   else if (j === 0) side0 = "red";
-            //   if (k === _z - 1) side1 = "green";
-            //   else if (k === 0) side5 = "blue";
-            //   break;
-            // case "blue":
-            //     if (i === _x - 1) side2 = "yellow";
-            //     else if (i === 0) side4 = "white";
-            //     if (j === _y - 1) side3 = "orange";
-            //     else if (j === 0) side0 = "red";
-            //     if (k === _z - 1) side1 = "blue";
-            //     else if (k === 0) side5 = "green";
-            //     break;
-            //   case "orange":
-            //   if (i === _x - 1) side2 = "green";
-            //   else if (i === 0) side4 = "blue";
-            //   if (j === _y - 1) side3 = "orange";
-            //   else if (j === 0) side0 = "red";
-            //   if (k === _z - 1) side1 = "yellow";
-            //   else if (k === 0) side5 = "white";
-            //   break;
-            // case "red":
-            //   if (i === _x - 1) side2 = "green";
-            //   else if (i === 0) side4 = "blue";
-            //   if (j === _y - 1) side3 = "orange";
-            //   else if (j === 0) side0 = "red";
-            //   if (k === _z - 1) side1 = "yellow";
-            //   else if (k === 0) side5 = "white";
-            //   break;
-            // case "white":
-            //   if (i === _x - 1) side2 = "blue";
-            //   else if (i === 0) side4 = "green";
-            //   if (j === _y - 1) side3 = "orange";
-            //   else if (j === 0) side0 = "red";
-            //   if (k === _z - 1) side1 = "white";
-            //   else if (k === 0) side5 = "yellow";
-            //   break;
-            default:
-              if (i === _x - 1) side2 = "green";
-              else if (i === 0) side4 = "blue";
-              if (j === _y - 1) side3 = "orange";
-              else if (j === 0) side0 = "red";
-              if (k === _z - 1) side1 = "yellow";
-              else if (k === 0) side5 = "white";
-              // if (i === _x - 1) side2 = "red";
-              // else if (i === 0) side4 = "orange";
-              // if (j === _y - 1) side3 = "yellow";
-              // else if (j === 0) side0 = "white";
-              // if (k === _z - 1) side1 = "blue";
-              // else if (k === 0) side5 = "green";
+          // If an orientation was provided, apply its face colors; otherwise use default mapping.
+          if (orientationFaces) {
+            // Orientation arrays are ordered: [left, right, back, front, top, bottom]
+            const [right, left, back, front, top, bottom] = orientationFaces;
+            if (i === _x - 1) side2 = right; // right face
+            else if (i === 0) side4 = left;  // left face
+            if (j === _y - 1) side3 = back;  // back face
+            else if (j === 0) side0 = front; // front face
+            if (k === _z - 1) side1 = top;   // top face
+            else if (k === 0) side5 = bottom;// bottom face
           }
 
           let tempCount = 0;

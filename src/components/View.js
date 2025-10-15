@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import "./MenuWrapper/MenuWrapper.css";
 import { Row, Col } from "react-bootstrap";
 import MenuOptions from "./MenuOptions/MenuOptions";
 import MenuOptionsOther from "./MenuOptionsOther/MenuOptionsOther";
 import Controls from "./Controls";
 import ColorPicker from "./ColorPicker/ColorPicker";
 import SolverUI from "./SolverUI/SolverUI";
+import "./View.css";
 
 
 class View extends Component {
@@ -66,10 +66,6 @@ class View extends Component {
         break;
       case 'Solver':
         activeMenu = <SolverUI {...this.props} />
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         break;
       case 'Algorithms':
         activeMenu = <SolverUI {...this.props} />
@@ -79,18 +75,15 @@ class View extends Component {
     }
 
 
-    //console.log("hi")
     return (
       <div className="menuWrapper" style={{ pointerEvents: "none" }}>
         <Row style={{ height: "100%", margin: "0px" }}>
-          {(this.props.state.activeMenu === "ColorPicker" || this.props.state.activeMenu === "Solver") ?
-            [] :
-            [<Col key="MenuOptions" style={{ paddingLeft: "0px" }}>
+          {(this.props.state.activeMenu === "ColorPicker" || this.props.state.activeMenu === "Solver") ? [] :
+            <Col key="MenuOptions" className="MenuOptions" style={{ paddingLeft: "20px", paddingBottom: "10px" }} >
               <MenuOptions {...this.props} />
-            </Col>,
-            <Col key="MenuOptionsPadding" style={{ padding: 0, color: "black", opacity: 0 }} xs={.5}>
-              .!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            </Col>]}
+              <MenuOptionsOther {...this.props} />
+            </Col>
+          }
           <Col
             id="menuBox"
             style={{ position: "relative", bottom: "0px", height: "100%" }}
@@ -101,12 +94,14 @@ class View extends Component {
           </Col>
           {(this.props.state.activeMenu === "ColorPicker" || this.props.state.activeMenu === "Solver" || this.props.state.activeMenu === "Algorithms") ?
             [] :
-            [<Col key="MenuOptionsOther" style={{ padding: 0, color: "black", opacity: 0 }} xs={.5}>
-              .
-            </Col>,
-            <Col key="MenuOptionsOtherPadding" style={{ paddingLeft: "0px", minWidth: "150px", paddingRight: "0px" }}>
-              <MenuOptionsOther {...this.props} />
-            </Col>]}
+            [
+              <Col key="MenuOptionsOther" style={{ padding: 0, color: "black", opacity: 1, display: "none" }} xs={.5}>
+                <MenuOptionsOther {...this.props} />
+              </Col>,
+              <Col key="MenuOptionsOtherPadding" style={{ paddingLeft: "0px", minWidth: "150px", paddingRight: "0px", display: "none" }}>
+                <MenuOptionsOther {...this.props} />
+              </Col>
+            ]}
         </Row>
 
       </div>)

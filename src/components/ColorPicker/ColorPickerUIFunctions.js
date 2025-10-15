@@ -413,7 +413,7 @@ const ColorPickerUIFunctions = {
     let obj = { error: [] };
     let validAmount = size * size;
     let rubiks = [...state.rubiksObject];
-    let generated = cube.generateSolved(size, size, size);
+    let generated = cube.generateSolved(size, size, size, "yellow", "red");
     let newGenerated = [];
     let invalidMiddleConfig;
     let invalidEdgeConfig;

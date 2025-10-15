@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import OrientationPicker from "./components/OrientationPicker";
 import * as Orientation from "./components/Orientation";
-import TopFaceColorPicker from "./components/ColorPicker/TopFaceColorPicker";
 import Navbar from "./components/Navbar/Navbar";
 import Speeds from "./components/Speeds/Speeds";
 import MoveInput from "./components/MoveInput";
@@ -12,7 +11,6 @@ import Menu from "./components/MenuWrapper/MenuWrapper";
 import * as THREE from "three";
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap';
 import cube from './cubeFunctions/cube';
 import moveFuncs from './cubeFunctions/move';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -37,29 +35,55 @@ class App extends Component {
   }
 
   handlePickOrientation = (topColor, frontColor) => {
-    // Use Orientation.js mapping to get correct face colors
+    // Validate combination using Orientation.js mappings
     const topKey = `${topColor.charAt(0).toUpperCase()}${topColor.slice(1)}Top`;
     const orientationObj = Orientation[topKey];
-    const topFaceColor = orientationObj ? orientationObj[frontColor] : null;
-    if (!topFaceColor) {
+    const orientationFaces = orientationObj ? orientationObj[frontColor] : null;
+    // Debug: log inputs and mapping result
+    // eslint-disable-next-line no-console
+    console.log("handlePickOrientation invoked:", { topColor, frontColor, orientationKey: topKey, isValid: !!orientationFaces, faces: orientationFaces });
+    if (!orientationFaces) {
       alert("Invalid orientation selection.");
       return;
     }
-    // Generate solved cube with correct face colors
+    // Generate solved cube with selected orientation
     const cD = this.state.cubeDimension;
-    const generated = cube.generateSolved(cD, cD, cD, topFaceColor);
+    const generated = cube.generateSolved(cD, cD, cD, topColor, frontColor);
     this.setState({
       topFaceColor: topColor,
       frontFaceColor: frontColor,
-      orientationFaces: topFaceColor,
+      orientationFaces,
       rubiksObject: generated.tempArr,
+      // Reset to a fresh cube state
+      moveLog: "",
+      moveSet: [],
+      prevSet: [],
+      solvedSet: [],
+      solvedSetIndex: 0,
+      solveMoves: "",
+      solveState: -1,
+      undoIndex: 0,
+      blockMoveLog: false,
+      isMulti: false,
+      face: 0,
+      turnDirection: 0,
+      start: 7.5,
+      end: 0,
       activeMenu: "",
+      reload: true,
+    }, () => {
+      // eslint-disable-next-line no-console
+      console.log("Orientation state applied:", { topFaceColor: this.state.topFaceColor, frontFaceColor: this.state.frontFaceColor });
+      // Repaint and snap all cubelets to solved positions with new colors
+      this.reloadTurnedPieces('all');
     });
   }
   state = {
     cubes: [],           // Contains visual cube
     rubiksObject: [],    // Contains memory cube
     blackObject: [],
+    topFaceColor: "yellow", // Default top
+    frontFaceColor: "red",  // Default front
     speed: 7.5,          // Control individual piece rotation speed (don't change)
     rotationSpeed: 350,  // Controls visual rotation speed
     start: 7.5,          // Start value for a rotation or set of rotations
@@ -338,20 +362,7 @@ class App extends Component {
     });
   }
 
-  changeTopFaceColor = (pos, color) => {
-    let tempObj = [...this.state.rubiksObject];
-    for (let i = 0; i < tempObj.length; i++) {
-      let tempCube = [...tempObj[i]];
-      if (tempCube[6] === pos.x && tempCube[7] === pos.y && tempCube[8] === pos.z) {
-        tempCube[1] = color;
-        tempObj[i] = [...tempCube];
-        i = tempObj.length;
-      }
-    }
-    this.setState({ rubiksObject: [...tempObj], isValidConfig: false, upDateCp: this.state.upDateCp + 1, cpErrors: [] }, () => {
-      this.reloadTurnedPieces('cp');
-    });
-  }
+  // removed obsolete changeTopFaceColor; orientation now controlled via OrientationPicker
 
   runCheckColors() {
     let obj = ColorPickerUIFunctions.checkColors(this.state);
@@ -362,7 +373,7 @@ class App extends Component {
   setColorPickedCube = () => {
     let rubiks = [...this.state.rubiksObject];
     let size = this.state.cubeDimension;
-    let generated = cube.generateSolved(size, size, size, "white");
+    let generated = cube.generateSolved(size, size, size, "yellow", "red");
     let newGenerated = [];
     let checked = [];
     let otherChecked = [];
@@ -497,7 +508,7 @@ class App extends Component {
   // Resets the cube and the move log
   reset = () => {
     let cD = this.state.cubeDimension;
-    let generated = cube.generateSolved(cD, cD, cD, "white");
+    let generated = cube.generateSolved(cD, cD, cD, this.state.topFaceColor || "yellow", this.state.frontFaceColor || "red");
     let rubiksObject = generated.tempArr;
     this.setState({ rubiksObject, moveSet: [], moveLog: "", currentFunc: "None", solveState: -1, autoPlay: false, playOne: false, isVisible: false, hoverData: [], solveMoves: "", prevSet: [], cpErrors: [], activeMenu: "none" }, () => {
       this.reloadTurnedPieces('all');
@@ -809,7 +820,7 @@ class App extends Component {
 
     // Initial set up variables
     let cD = this.getSizeFromUrl();
-    let generated = cube.generateSolved(cD, cD, cD, "white");
+    let generated = cube.generateSolved(cD, cD, cD, this.state.topFaceColor || "yellow", this.state.frontFaceColor || "red");
     let rubiksObject = generated.tempArr;
     let tempCubes = [];
 
@@ -1468,7 +1479,7 @@ class App extends Component {
           state={this.state}
         />
 
-        {this.state.currentFunc === "Color Picker" ? <></> : <p style={{ position: "fixed", top: "110px", left: "10px", color: "lightgrey", fontSize: "1rem" }}>Speed: {this.state.currentSpeed}</p>}
+        {this.state.currentFunc === "Color Picker" ? <></> : <p style={{ position: "fixed", top: "110px", left: "10px", color: "lightgrey", fontSize: "1rem", display: "none" }}>Speed: {this.state.currentSpeed}</p>}
 
         {this.state.currentFunc === "Color Picker" ? [] : <Speeds //Top left with slider
           onSliderChange={this.onSliderChange}
@@ -1527,21 +1538,12 @@ class App extends Component {
           // Orientation
           onSetOrientation={this.handleSetOrientation}
         />
-        {/* Show OrientationPicker when activeMenu is SetOrientation */}
-        {this.state.activeMenu === "SetOrientation" && (
-          <OrientationPicker
-            onSetOrientation={this.handlePickOrientation}
-            currentTop={this.state.topFaceColor}
-            currentFront={this.state.topFaceColor}
-          />
-        )}
-        {/* Show TopFaceColorPicker when activeMenu is SetTopFaceColor */}
-        {this.state.activeMenu === "SetTopFaceColor" && (
-          <TopFaceColorPicker
-            onPick={this.handlePickTopFaceColor}
-            currentColor={this.state.topFaceColor || this.state.colorPicked}
-          />
-        )}
+        {/* Always show OrientationPicker */}
+        <OrientationPicker
+          onSetOrientation={this.handlePickOrientation}
+          currentTop={this.state.topFaceColor}
+          currentFront={this.state.frontFaceColor}
+        />
 
         <div style={{ width: "100%", position: "absolute", bottom: "85px", margin: "auto", display: "flex" }}>
           <div style={{ margin: "auto", display: "inline-flex", }}>
@@ -1551,8 +1553,7 @@ class App extends Component {
               : ""
             }
           </div>
-          <button style={{ position: "relative", left: "-700px", color: "black" }} type="button" onClick={this.changeFaceColor} >button</button>
-          <button style={{ position: "relative", left: "-650px", color: "red" }} type="button" onClick={this.changeTopFaceColor} >button</button>
+          {/* removed debug buttons */}
         </div>
 
       </div>
