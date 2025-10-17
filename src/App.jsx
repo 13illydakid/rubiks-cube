@@ -35,7 +35,8 @@ class App extends Component {
     this.setState({ activeMenu: "SetOrientation" });
   }
 
-  handlePickOrientation = (topColor, frontColor) => {
+  handlePickOrientation = (topColor, frontColor, options) => {
+    const reset = options && options.reset === true;
     // Validate combination using Orientation.js mappings
     const topKey = `${topColor.charAt(0).toUpperCase()}${topColor.slice(1)}Top`;
     const orientationObj = Orientation[topKey];
@@ -47,37 +48,50 @@ class App extends Component {
       alert("Invalid orientation selection.");
       return;
     }
-    // Generate solved cube with selected orientation
-    const cD = this.state.cubeDimension;
-    const generated = cube.generateSolved(cD, cD, cD, topColor, frontColor);
-    this.setState({
-      topFaceColor: topColor,
-      frontFaceColor: frontColor,
-      orientationFaces,
-      rubiksObject: generated.tempArr,
-      // Reset to a fresh cube state
-      moveLog: "",
-      moveSet: [],
-      prevSet: [],
-      solvedSet: [],
-      solvedSetIndex: 0,
-      solveMoves: "",
-      solveState: -1,
-      undoIndex: 0,
-      blockMoveLog: false,
-      isMulti: false,
-      face: 0,
-      turnDirection: 0,
-      start: 7.5,
-      end: 0,
-      activeMenu: "",
-      reload: true,
-    }, () => {
-      // eslint-disable-next-line no-console
-      console.log("Orientation state applied:", { topFaceColor: this.state.topFaceColor, frontFaceColor: this.state.frontFaceColor });
-      // Repaint and snap all cubelets to solved positions with new colors
-      this.reloadTurnedPieces('all');
-    });
+    if (reset) {
+      // Generate solved cube with selected orientation and reset state
+      const cD = this.state.cubeDimension;
+      const generated = cube.generateSolved(cD, cD, cD, topColor, frontColor);
+      this.setState({
+        topFaceColor: topColor,
+        frontFaceColor: frontColor,
+        orientationFaces,
+        rubiksObject: generated.tempArr,
+        // Reset to a fresh cube state
+        moveLog: "",
+        moveSet: [],
+        prevSet: [],
+        solvedSet: [],
+        solvedSetIndex: 0,
+        solveMoves: "",
+        solveState: -1,
+        undoIndex: 0,
+        blockMoveLog: false,
+        isMulti: false,
+        face: 0,
+        turnDirection: 0,
+        start: 7.5,
+        end: 0,
+        activeMenu: "",
+        reload: true,
+      }, () => {
+        // eslint-disable-next-line no-console
+        console.log("Orientation state applied with reset:", { topFaceColor: this.state.topFaceColor, frontFaceColor: this.state.frontFaceColor });
+        // Repaint and snap all cubelets to solved positions with new colors
+        this.reloadTurnedPieces('all');
+      });
+    } else {
+      // Update only orientation/top/front so future operations interpret faces relative to new orientation
+      // Do not change rubiksObject; pieces stay in current positions relative to each other.
+      this.setState({
+        topFaceColor: topColor,
+        frontFaceColor: frontColor,
+        orientationFaces,
+      }, () => {
+        // eslint-disable-next-line no-console
+        console.log("Orientation state applied without reset:", { topFaceColor: this.state.topFaceColor, frontFaceColor: this.state.frontFaceColor });
+      });
+    }
   }
   state = {
     cubes: [],           // Contains visual cube
@@ -817,6 +831,9 @@ class App extends Component {
   // Remove event listener on compenent unmount
   componentWillUnmount() {
     window.removeEventListener("keydown", this.keyHandling);
+    if (typeof window !== 'undefined' && this.handleGlobalDblClick) {
+      window.removeEventListener('dblclick', this.handleGlobalDblClick, false);
+    }
   }
 
   // Gets the url to be parsed
@@ -921,6 +938,67 @@ class App extends Component {
     this.setState({ resized: true });
   }
 
+  // Smoothly animate the camera back to a target orientation over `durationMs`.
+  // By default, keeps the current radius (distance to target) to avoid zooming.
+  animateCameraTo = (targetPos, durationMs = 600, lockRadius = true) => {
+    if (!this.camera || !this.controls) return;
+    if (this._camAnimRAF) {
+      cancelAnimationFrame(this._camAnimRAF);
+      this._camAnimRAF = null;
+    }
+
+    // OrbitControls target is the cube origin
+    const target = new THREE.Vector3(0, 0, 0);
+    const startVec = this.camera.position.clone().sub(target);
+    const endVec = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z).sub(target);
+
+    const startSph = new THREE.Spherical().setFromVector3(startVec);
+    const endSphRaw = new THREE.Spherical().setFromVector3(endVec);
+    const startRadius = startSph.radius;
+    const endSph = endSphRaw.clone();
+    if (lockRadius) endSph.radius = startRadius;
+
+    // Normalize azimuthal delta to take shortest path around the circle
+    let dTheta = endSph.theta - startSph.theta;
+    if (dTheta > Math.PI) dTheta -= Math.PI * 2;
+    if (dTheta < -Math.PI) dTheta += Math.PI * 2;
+    const dPhi = endSph.phi - startSph.phi;
+
+    const t0 = performance.now();
+    const dur = Math.max(0, durationMs);
+
+    const prevEnabled = this.controls.enabled;
+    this.controls.enabled = false;
+
+    const clampPhi = (phi) => Math.min(Math.max(phi, 0.0001), Math.PI - 0.0001);
+    const easeInOutCubic = (t) => (t < 0.5) ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const step = (now) => {
+      const raw = dur === 0 ? 1 : Math.min(1, (now - t0) / dur);
+      const t = easeInOutCubic(raw);
+      const sph = new THREE.Spherical(
+        lockRadius ? startRadius : (startSph.radius + (endSph.radius - startSph.radius) * t),
+        clampPhi(startSph.phi + dPhi * t),
+        startSph.theta + dTheta * t
+      );
+      const pos = new THREE.Vector3().setFromSpherical(sph).add(target);
+      this.camera.position.copy(pos);
+      this.controls.target.copy(target);
+      this.controls.update();
+      if (raw < 1) {
+        this._camAnimRAF = requestAnimationFrame(step);
+      } else {
+        this._camAnimRAF = null;
+        this.controls.enabled = prevEnabled;
+        if (this.renderer && this.scene) {
+          this.renderer.render(this.scene, this.camera);
+        }
+      }
+    };
+
+    this._camAnimRAF = requestAnimationFrame(step);
+  }
+
   // Initialization and animation functions
   componentDidMount() {
 
@@ -935,9 +1013,13 @@ class App extends Component {
     let ignoreChange = false;
 
     // === THREE.JS VARIABLES ===
-    let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(75, (window.innerWidth / window.innerHeight), 0.1, 1000);
-    let renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, (window.innerWidth / window.innerHeight), 0.1, 1000);
+  let renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  // Expose refs on instance for later access (e.g., dblclick reset)
+  this.scene = scene;
+  this.camera = camera;
+  this.renderer = renderer;
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
     let cubeGeometry = new THREE.BoxGeometry();
@@ -1106,6 +1188,22 @@ class App extends Component {
       controls.enabled = true;
     }
 
+    // Add global double-click handler to reset camera angle (ignores UI regions)
+    this.handleGlobalDblClick = (evt) => {
+      try {
+        const path = (evt.composedPath && evt.composedPath()) || [];
+        const shouldIgnore = path.some(el => {
+          if (!el || !el.dataset) return false;
+          return el.dataset.noCameraReset === 'true' || el.dataset.role === 'sidebar' || el.dataset.role === 'orientation';
+        });
+        if (shouldIgnore) return;
+        if (this.camera && this.controls) {
+          const init = this.initialCameraPosition || { x: 10, y: 10, z: 10 };
+          this.animateCameraTo(init, 650);
+        }
+      } catch (_) { /* no-op */ }
+    };
+
     // Bind event listeners to window
     window.addEventListener("keydown", this.keyHandling, false);
     window.addEventListener("pointermove", onMouseMove.bind(this), false);
@@ -1115,6 +1213,7 @@ class App extends Component {
     // window.addEventListener("touchend", ontouchend, false);
     window.addEventListener("pointerup", ontouchend, false);
     window.addEventListener("resize", () => onWindowResize(this.windowResized), false);
+  window.addEventListener('dblclick', this.handleGlobalDblClick, false);
 
     // Set background color and size
     renderer.setClearColor(new THREE.Color("black"), 0.3);
@@ -1196,6 +1295,9 @@ class App extends Component {
     controls.target.set(0, 0, 0);
     controls.update();
 
+    // Store controls on instance
+    this.controls = controls;
+
     controls.addEventListener("change", (e) => {
       if (renderer) renderer.render(scene, camera);
     });
@@ -1236,6 +1338,16 @@ class App extends Component {
     // Apply this to the pivot so the rotation happens around the cube center
     // Initial visual orientation: lowercase 'x' (rotate in the direction of 'r')
     pivotGroup.rotation.x = -Math.PI / 2;
+
+      // Save initial camera position and controls state for reset
+      this.initialCameraPosition = {
+        x: this.state.cameraX,
+        y: this.state.cameraY,
+        z: this.state.cameraZ,
+      };
+      if (this.controls && this.controls.saveState) {
+        this.controls.saveState();
+      }
 
       renderer.render(scene, camera);
       animate();
@@ -1549,45 +1661,50 @@ class App extends Component {
           /> : []
         }
 
-        <Menu
-          state={this.state}
-          setState={this.menuSetState}
-          beginScramble={this.beginScramble}
-          disableHover={this.state.showGuideArrows}
+        <div data-role="sidebar" data-no-camera-reset="true">
+          <Menu
+            state={this.state}
+            setState={this.menuSetState}
+            beginScramble={this.beginScramble}
+            disableHover={this.state.showGuideArrows}
 
-          //Controls
-          generatedButtons={this.state.generatedButtons}
-          size={this.getSizeFromUrl()}
-          rotateOneFace={this.rotateOneFace}
-          mouseEnter={this.mouseOver}
-          mouseLeave={this.mouseLeave}
+            //Controls
+            generatedButtons={this.state.generatedButtons}
+            size={this.getSizeFromUrl()}
+            rotateOneFace={this.rotateOneFace}
+            mouseEnter={this.mouseOver}
+            mouseLeave={this.mouseLeave}
 
-          //Color Picker
-          beginColorPicker={this.beginColorPicker}
-          endColorPicker={this.endColorPicker}
-          colorPicked={this.state.colorPicked}
-          changeColor={this.changeColor}
-          isValidConfig={this.state.isValidConfig}
-          setColorPickedCube={this.setColorPickedCube}
-          cpErrors={this.state.cpErrors}
-          runCheckColors={this.runCheckColors}
+            //Color Picker
+            beginColorPicker={this.beginColorPicker}
+            endColorPicker={this.endColorPicker}
+            colorPicked={this.state.colorPicked}
+            changeColor={this.changeColor}
+            isValidConfig={this.state.isValidConfig}
+            setColorPickedCube={this.setColorPickedCube}
+            cpErrors={this.state.cpErrors}
+            runCheckColors={this.runCheckColors}
 
-          //Solver
-          beginSolve={this.beginSolve}
-          stopSolve={this.stopSolve}
-          playOne={this.playOne}
-          rewindOne={this.rewindSolve}
-          reload={this.reloadTurnedPieces}
+            //Solver
+            beginSolve={this.beginSolve}
+            stopSolve={this.stopSolve}
+            playOne={this.playOne}
+            rewindOne={this.rewindSolve}
+            reload={this.reloadTurnedPieces}
 
-          // Orientation
-          onSetOrientation={this.handleSetOrientation}
-        />
+            // Orientation
+            onSetOrientation={this.handleSetOrientation}
+          />
+        </div>
         {/* Always show OrientationPicker */}
-        <OrientationPicker
-          onSetOrientation={this.handlePickOrientation}
-          currentTop={this.state.topFaceColor}
-          currentFront={this.state.frontFaceColor}
-        />
+        <div data-role="orientation" data-no-camera-reset="true">
+          <OrientationPicker
+            onSetOrientation={this.handlePickOrientation}
+            executeCubeRotation={this.executeCubeRotation}
+            currentTop={this.state.topFaceColor}
+            currentFront={this.state.frontFaceColor}
+          />
+        </div>
 
         <div style={{ width: "100%", position: "absolute", bottom: "85px", margin: "auto", display: "flex" }}>
           <div style={{ margin: "auto", display: "inline-flex", }}>
