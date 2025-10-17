@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Row, Col } from "react-bootstrap";
-import ColorButton from "../ColorPicker/ColorButton";
+import ColorButton from "../ColorPicker/ColorButton.jsx";
 import "../ColorPicker/ColorPicker.css";
 import "./TopFaceColor.css";
 

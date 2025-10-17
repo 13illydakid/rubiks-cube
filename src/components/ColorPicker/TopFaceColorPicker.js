@@ -1,5 +1,5 @@
 import React from "react";
-import ColorButton from "./ColorButton";
+import ColorButton from "./ColorButton.jsx";
 import "./ColorPicker.css";
 
 const colors = ["white", "blue", "red", "yellow", "orange", "green"];

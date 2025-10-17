@@ -1,24 +1,13 @@
 import React from "react";
 import "./Nav.css";
-import { DropdownButton, Dropdown } from 'react-bootstrap'
+// Cleaned up unused react-bootstrap dropdown imports
 import Popup from "reactjs-popup";
 import notations from "../../assets/notations.png";
 import { Link } from "react-router-dom";
 import logo from "../../assets/favicon.png";
 
 const Navbar = props => {
-  const navCubes = [];
-
-  function reloadPage() {
-    setTimeout(function () {
-      window.location.reload();
-    }, 50);
-  }
-  for (let i = 2; i <= 10; i++) {
-    navCubes.push(
-      <Dropdown.Item key={i} href={`/RubiksProgram/#id=${i}`} onClick={reloadPage}>{i} X {i}</Dropdown.Item>
-    )
-  }
+  // Legacy dropdowns removed during cleanup
   return (
     <nav className="navbar navbar-dark fixed-top">
       {/* <ul className="nav nav-justified mr-auto">

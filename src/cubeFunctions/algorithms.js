@@ -33,7 +33,7 @@ const snakeEyes = convertRuwixAlgo("R2 U2 R2 U2 R2 U2".split(' ').join(''));
 const weirdo = convertRuwixAlgo("R' F' U F2 U' F R' F2 D2 F2 D2 F2 D F2 R2 U2".split(' ').join(''));
 */
 
-const anaconda = reverseAlgo(convertRuwixAlgo("RU'U'R'R'FRF'UUR'FRF'"));
+// const anaconda = reverseAlgo(convertRuwixAlgo("RU'U'R'R'FRF'UUR'FRF'"));
 // const one = convertRuwixAlgo("RU'U'R")
 const one = convertRuwixAlgo("RU'U'R'R'FRF'UUR'FRF'");
 
@@ -127,20 +127,7 @@ function convertRuwixAlgo(algoStr) {
     .trim();
 }
 
-let bundle = (name, moveSet, rangeLow, rangeHigh) => {
-  let sets = [];
-  sets.push(
-    {
-      name: name,
-      moves: moveSet,
-      worksFor: []
-    }
-  );
-  for (let i = rangeLow; i <= rangeHigh; i++) {
-    sets[0].worksFor.push(i);
-  }
-  return sets;
-}
+// Removed unused bundle() helper
 
 let blankBundle = (name) => {
   let cubeSizes = [];
@@ -179,7 +166,7 @@ let generalizedBundle = (name, moveSet, moveSet2) => {
       });
     }
   }
-  
+
   return sets;
 }
 
@@ -224,61 +211,61 @@ let algorithms = [
   // ...generalizedBundle("Anaconda", anaconda),
   ...generalizedBundle("OLL-1", one),
   ...generalizedBundle("OLL-2", two),
-...generalizedBundle("OLL-3", three),
-...generalizedBundle("OLL-4", four),
-...generalizedBundle("OLL-5", five),
-...generalizedBundle("OLL-6", six),
-...generalizedBundle("OLL-7", seven),
-...generalizedBundle("OLL-8", eight),
-...generalizedBundle("OLL-9", nine),
-...generalizedBundle("OLL-10", ten),
-...generalizedBundle("OLL-11", eleven),
-...generalizedBundle("OLL-12", twelve),
-...generalizedBundle("OLL-13", thirteen),
-...generalizedBundle("OLL-14", fourteen),
-...generalizedBundle("OLL-15", fifteen),
-...generalizedBundle("OLL-16", sixteen),
-...generalizedBundle("OLL-17", seventeen),
-...generalizedBundle("OLL-18", eighteen),
-...generalizedBundle("OLL-19", nineteen),
-...generalizedBundle("OLL-20", twenty),
-...generalizedBundle("OLL-21", twentyone),
-...generalizedBundle("OLL-22", twentytwo),
-...generalizedBundle("OLL-23", twentythree),
-...generalizedBundle("OLL-24", twentyfour),
-...generalizedBundle("OLL-25", twentyfive),
-...generalizedBundle("OLL-26", twentysix),
-...generalizedBundle("OLL-27", twentyseven),
-...generalizedBundle("OLL-28", twentyeight),
-...generalizedBundle("OLL-29", twentynine),
-...generalizedBundle("OLL-30", thirty),
-...generalizedBundle("OLL-31", thirtyone),
-...generalizedBundle("OLL-32", thirtytwo),
-...generalizedBundle("OLL-33", thirtythree),
-...generalizedBundle("OLL-34", thirtyfour),
-...generalizedBundle("OLL-35", thirtyfive),
-...generalizedBundle("OLL-36", thirtysix),
-...generalizedBundle("OLL-37", thirtyseven),
-...generalizedBundle("OLL-38", thirtyeight),
-...generalizedBundle("OLL-39", thirtynine),
-...generalizedBundle("OLL-40", forty),
-...generalizedBundle("OLL-41", fortyone),
-...generalizedBundle("OLL-42", fortytwo),
-...generalizedBundle("OLL-43", fortythree),
-...generalizedBundle("OLL-44", fortyfour),
-...generalizedBundle("OLL-45", fortyfive),
-...generalizedBundle("OLL-46", fortysix),
-...generalizedBundle("OLL-47", fortyseven),
-...generalizedBundle("OLL-48", fortyeight),
-...generalizedBundle("OLL-49", fortynine),
-...generalizedBundle("OLL-50", fifty),
-...generalizedBundle("OLL-51", fiftyone),
-...generalizedBundle("OLL-52", fiftytwo),
-...generalizedBundle("OLL-53", fiftythree),
-...generalizedBundle("OLL-54", fiftyfour),
-...generalizedBundle("OLL-55", fiftyfive),
-...generalizedBundle("OLL-56", fiftysix),
-...generalizedBundle("OLL-57", fiftyseven),
+  ...generalizedBundle("OLL-3", three),
+  ...generalizedBundle("OLL-4", four),
+  ...generalizedBundle("OLL-5", five),
+  ...generalizedBundle("OLL-6", six),
+  ...generalizedBundle("OLL-7", seven),
+  ...generalizedBundle("OLL-8", eight),
+  ...generalizedBundle("OLL-9", nine),
+  ...generalizedBundle("OLL-10", ten),
+  ...generalizedBundle("OLL-11", eleven),
+  ...generalizedBundle("OLL-12", twelve),
+  ...generalizedBundle("OLL-13", thirteen),
+  ...generalizedBundle("OLL-14", fourteen),
+  ...generalizedBundle("OLL-15", fifteen),
+  ...generalizedBundle("OLL-16", sixteen),
+  ...generalizedBundle("OLL-17", seventeen),
+  ...generalizedBundle("OLL-18", eighteen),
+  ...generalizedBundle("OLL-19", nineteen),
+  ...generalizedBundle("OLL-20", twenty),
+  ...generalizedBundle("OLL-21", twentyone),
+  ...generalizedBundle("OLL-22", twentytwo),
+  ...generalizedBundle("OLL-23", twentythree),
+  ...generalizedBundle("OLL-24", twentyfour),
+  ...generalizedBundle("OLL-25", twentyfive),
+  ...generalizedBundle("OLL-26", twentysix),
+  ...generalizedBundle("OLL-27", twentyseven),
+  ...generalizedBundle("OLL-28", twentyeight),
+  ...generalizedBundle("OLL-29", twentynine),
+  ...generalizedBundle("OLL-30", thirty),
+  ...generalizedBundle("OLL-31", thirtyone),
+  ...generalizedBundle("OLL-32", thirtytwo),
+  ...generalizedBundle("OLL-33", thirtythree),
+  ...generalizedBundle("OLL-34", thirtyfour),
+  ...generalizedBundle("OLL-35", thirtyfive),
+  ...generalizedBundle("OLL-36", thirtysix),
+  ...generalizedBundle("OLL-37", thirtyseven),
+  ...generalizedBundle("OLL-38", thirtyeight),
+  ...generalizedBundle("OLL-39", thirtynine),
+  ...generalizedBundle("OLL-40", forty),
+  ...generalizedBundle("OLL-41", fortyone),
+  ...generalizedBundle("OLL-42", fortytwo),
+  ...generalizedBundle("OLL-43", fortythree),
+  ...generalizedBundle("OLL-44", fortyfour),
+  ...generalizedBundle("OLL-45", fortyfive),
+  ...generalizedBundle("OLL-46", fortysix),
+  ...generalizedBundle("OLL-47", fortyseven),
+  ...generalizedBundle("OLL-48", fortyeight),
+  ...generalizedBundle("OLL-49", fortynine),
+  ...generalizedBundle("OLL-50", fifty),
+  ...generalizedBundle("OLL-51", fiftyone),
+  ...generalizedBundle("OLL-52", fiftytwo),
+  ...generalizedBundle("OLL-53", fiftythree),
+  ...generalizedBundle("OLL-54", fiftyfour),
+  ...generalizedBundle("OLL-55", fiftyfive),
+  ...generalizedBundle("OLL-56", fiftysix),
+  ...generalizedBundle("OLL-57", fiftyseven),
 
 ]
 

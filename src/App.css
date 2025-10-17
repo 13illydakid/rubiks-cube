@@ -27,44 +27,42 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
-.redoUndo{
-  background-repeat:no-repeat;
+.redoUndo {
+  background-repeat: no-repeat;
   border-radius: .25rem;
   border: 2px solid #007bff;
   background-position: 50% 50%;
   transition: background-color .4s ease;
-  background-color: rgba(0,0,255,.10);
+  background-color: rgba(0, 0, 255, .10);
 }
 
-.redoUndo:hover{
-  background-color: rgba(0,0,255,.5);
+.redoUndo:hover {
+  background-color: rgba(0, 0, 255, .5);
 }
 
-.redoUndo:active{
-  background-color: rgba(0,0,255,.25);
+.redoUndo:active {
+  background-color: rgba(0, 0, 255, .25);
 }
 
-body {
-  background-color: black;
-}
-
-/* Index.html styling migration */
-/*
 body {
   background-color: black;
   overflow: hidden;
   -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-      -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
+
+/* Index.html styling migration */
+/*
 .nav-fix-for-edge{
   display:"flex";
 }
@@ -153,19 +151,23 @@ button:focus {outline:0;}
   padding-left: 20px;
   padding-right: 20px;
 }
+*/
 
-.canvas{
+/* Canvas background and behavior (from CRA) */
+.canvas {
   overflow: hidden;
   background-size: cover;
   background-position: center;
   background: radial-gradient(#343a40, #000000);
 }
-#moveInput{
+
+/* Prevent selecting text in move input */
+#moveInput {
   -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-      -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   min-width: max-content;
-} */
+}

@@ -1,14 +1,5 @@
 import * as THREE from "three";
 
-const cubeSyntaxTranslation = {
-  side2: "right",  // 3
-  side4: "left",   // 2
-  side3: "back",   // 4
-  side0: "front",  // 1
-  side1: "top",    // 0
-  side5: "bottom", // 5
-};
-
 const YellowTop = {
   "red": ["green", "blue", "orange", "red", "yellow", "white"],
   "blue": ["red", "orange", "green", "blue", "yellow", "white"],
@@ -119,8 +110,12 @@ const cube = {
 
           // If an orientation was provided, apply its face colors; otherwise use default mapping.
           if (orientationFaces) {
-            // Orientation arrays are ordered: [left, right, back, front, top, bottom]
-            const [right, left, back, front, top, bottom] = orientationFaces;
+            // Orientation arrays are ordered: [right, left, back, front, top, bottom]
+            let right, left, back, front, top, bottom;
+            [right, left, back, front, top, bottom] = orientationFaces;
+            // Explicitly enforce requested top/front colors to match UI selection
+            if (typeof frontFaceColor === "string") front = frontFaceColor;
+            if (typeof topFaceColor === "string") top = topFaceColor;
             if (i === _x - 1) side2 = right; // right face
             else if (i === 0) side4 = left;  // left face
             if (j === _y - 1) side3 = back;  // back face

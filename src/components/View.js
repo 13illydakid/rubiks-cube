@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { Row, Col } from "react-bootstrap";
-import MenuOptions from "./MenuOptions/MenuOptions";
-import MenuOptionsOther from "./MenuOptionsOther/MenuOptionsOther";
-import Controls from "./Controls";
-import ColorPicker from "./ColorPicker/ColorPicker";
-import SolverUI from "./SolverUI/SolverUI";
+import MenuOptions from "./MenuOptions/MenuOptions.jsx";
+import MenuOptionsOther from "./MenuOptionsOther/MenuOptionsOther.jsx";
+import Controls from "./Controls.jsx";
+import ColorPicker from "./ColorPicker/ColorPicker.jsx";
+import SolverUI from "./SolverUI/SolverUI.jsx";
 import "./View.css";
 
 

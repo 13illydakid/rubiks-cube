@@ -1,10 +1,13 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App';
+import { render, cleanup } from '@testing-library/react';
+import { describe, it, afterEach, expect } from 'vitest';
+import App from './App.jsx';
 
-it('renders without crashing', () => {
-  const div = document.createElement('div');
-  const root = createRoot(div);
-  root.render(<App />);
-  root.unmount();
+describe('App', () => {
+  afterEach(() => cleanup());
+  it('renders without crashing', () => {
+    const { unmount } = render(<App />);
+    expect(document.body).toBeDefined();
+    unmount();
+  });
 });
