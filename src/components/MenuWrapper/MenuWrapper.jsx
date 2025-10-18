@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import MobileView from "../MobileView/MobileView.jsx";
-import View from "../View.jsx";
-import SideView from "../SideView/SideView.jsx";
+import ResponsiveView from "../ResponsiveView/ResponsiveView.jsx";
 class Menu extends Component {
   constructor(props) {
     super(props);
@@ -37,15 +35,7 @@ class Menu extends Component {
   }
   render() {
     const props = this.props;
-    return (window.innerWidth > 900 && window.innerHeight > 580) ?
-      <>
-        <SideView {...props} />
-      </>
-      : window.innerWidth > 600 ?
-      <View {...props} />
-      :
-      <MobileView {...props} />
-      ;
+    return <ResponsiveView {...props} />;
   }
 }
 

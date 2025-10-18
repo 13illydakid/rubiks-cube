@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Row, Col } from "react-bootstrap";
-import MenuOptions from "./MenuOptions/MenuOptions.jsx";
-import MenuOptionsOther from "./MenuOptionsOther/MenuOptionsOther.jsx";
+import MenuOptionsUnified from "./MenuOptions/MenuOptionsUnified.jsx";
 import Controls from "./Controls.jsx";
 import ColorPicker from "./ColorPicker/ColorPicker.jsx";
 import SolverUI from "./SolverUI/SolverUI.jsx";
@@ -67,8 +66,7 @@ class View extends Component {
         <Row style={{ height: "100%", margin: "0px" }}>
           {(this.props.state.activeMenu === "ColorPicker" || this.props.state.activeMenu === "Solver") ? [] :
             <Col key="MenuOptions" className="MenuOptions" style={{ paddingLeft: "20px", paddingBottom: "10px" }} >
-              <MenuOptions {...this.props} />
-              <MenuOptionsOther {...this.props} />
+              <MenuOptionsUnified {...this.props} />
             </Col>
           }
           <Col
@@ -79,16 +77,7 @@ class View extends Component {
                 12 : this.props.state.currentFunc === "None" || this.props.state.currentFunc === "Scrambling" || this.props.state.currentFunc === "Reset" ? 4 : 8}>
             {activeMenu}
           </Col>
-          {(this.props.state.activeMenu === "ColorPicker" || this.props.state.activeMenu === "Solver" || this.props.state.activeMenu === "Algorithms") ?
-            [] :
-            [
-              <Col key="MenuOptionsOther" style={{ padding: 0, color: "black", opacity: 1, display: "none" }} xs={.5}>
-                <MenuOptionsOther {...this.props} />
-              </Col>,
-              <Col key="MenuOptionsOtherPadding" style={{ paddingLeft: "0px", minWidth: "150px", paddingRight: "0px", display: "none" }}>
-                <MenuOptionsOther {...this.props} />
-              </Col>
-            ]}
+          {(this.props.state.activeMenu === "ColorPicker" || this.props.state.activeMenu === "Solver" || this.props.state.activeMenu === "Algorithms") ? [] : null}
         </Row>
 
       </div>)

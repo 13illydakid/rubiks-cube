@@ -27,11 +27,15 @@ Notes
   - components/ColorPicker/ColorPicker.css
 - Info banner remains at components/ColorPickerInfo/ColorPickerInfo.jsx
 - Menus:
-  - components/MenuOptions/MenuOptions.jsx
-  - components/MenuOptionsOther/MenuOptionsOther.jsx
+  - components/MenuOptions/MenuOptionsUnified.jsx (replaces separate left/right menus)
 - Views:
-  - components/SideView/SideView.jsx
-  - components/MobileView/MobileView.jsx
-  - components/View.jsx
+  - Single responsive entry: components/ResponsiveView/ResponsiveView.jsx
+  - Removed: components/SideView/SideView.jsx
+  - Removed: components/MobileView/MobileView.jsx
+  - Kept: components/View.jsx (used internally by ResponsiveView for mid breakpoint and desktop base layout)
+
+Follow-up ideas
+- If desired, inline View.jsx layout into ResponsiveView to have a single file own all menu/content rendering, then delete View.jsx.
+- Consider pruning now-unused MenuOptionsOther folder if present and verify no imports reference it (we already switched to MenuOptionsUnified).
 
 If you want, we can further consolidate MenuOptions + MenuOptionsOther into a single MenuOptions with left/right groups, but that requires JSX tweaks.
