@@ -1,0 +1,113 @@
+/* OLL Panel styles */
+.oll-panel {
+  position: fixed;
+  left: 10px;
+  top: 80px;
+  width: 340px;
+  max-height: 75vh;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #007bff;
+  border-radius: .25rem;
+  color: lightgrey;
+  padding: 8px;
+  overflow: auto;
+  z-index: 100000;
+}
+
+.oll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.oll-title-main {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.oll-sub {
+  font-size: .9rem;
+  opacity: .8;
+}
+
+.oll-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  max-height: 48vh;
+  overflow-y: auto;
+}
+
+.oll-item {
+  border: 1px solid #007bff;
+  border-radius: .25rem;
+  padding: 6px;
+  cursor: pointer;
+  background: rgba(0, 0, 255, .10);
+}
+
+.oll-item.selected {
+  background: rgba(0, 128, 255, .20);
+}
+
+.oll-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.oll-notation {
+  font-family: monospace;
+  font-size: .85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oll-controls {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.oll-btn {
+  flex: 1;
+  border: 1px solid #007bff;
+  border-radius: .25rem;
+  background: rgba(0, 0, 255, .10);
+  color: lightgrey;
+  padding: 6px;
+}
+
+.oll-btn:hover {
+  background: rgba(0, 0, 255, .25);
+}
+
+.oll-notation-view {
+  margin-top: 8px;
+}
+
+.oll-notation-view .label {
+  font-size: .9rem;
+  opacity: .9;
+  margin-bottom: 4px;
+}
+
+.oll-notation-view .steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.oll-notation-view .step {
+  font-family: monospace;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .4);
+  border: 1px solid rgba(255, 255, 255, .15);
+}
+
+.oll-notation-view .step.active {
+  background: rgba(0, 128, 255, .35);
+  border-color: #007bff;
+}

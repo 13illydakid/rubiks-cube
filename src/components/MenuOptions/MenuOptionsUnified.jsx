@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./MenuOptions.css";
 import algorithms from "../../cubeFunctions/algorithms";
 import cube from "../../cubeFunctions/cube";
@@ -7,6 +7,7 @@ const optionLimitSOLVER = 100;
 
 const MenuOptionsUnified = (props) => {
   const { state } = props;
+  const [showOll, setShowOll] = useState(false);
 
   // Left group (Solver/Algorithms)
   const left = () => {
@@ -40,6 +41,7 @@ const MenuOptionsUnified = (props) => {
         ) : (
           <button className="leftButton invis"></button>
         )}
+        {/* OLL moved to NewMenu overlay */}
       </>
     );
 

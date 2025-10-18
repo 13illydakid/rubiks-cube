@@ -7,6 +7,7 @@ import MoveInput from "./components/MoveInput.jsx";
 import SolverInfo from "./components/SolverInfo/SolverInfo.jsx";
 import ColorPickerInfo from "./components/ColorPickerInfo/ColorPickerInfo.jsx";
 import Menu from "./components/MenuWrapper/MenuWrapper.jsx";
+import NewMenu from "./components/NewMenu/NewMenu.jsx";
 
 import * as THREE from "three";
 import './App.css';
@@ -1696,6 +1697,15 @@ class App extends Component {
             onSetOrientation={this.handleSetOrientation}
           />
         </div>
+        {/* New lightweight overlay menu with OLL */}
+        <NewMenu
+          state={this.state}
+          setState={this.menuSetState}
+          beginScramble={this.beginScramble}
+          beginSolve={this.beginSolve}
+          stopSolve={this.stopSolve}
+          reload={this.reloadTurnedPieces}
+        />
         {/* Always show OrientationPicker */}
         <div data-role="orientation" data-no-camera-reset="true">
           <OrientationPicker
