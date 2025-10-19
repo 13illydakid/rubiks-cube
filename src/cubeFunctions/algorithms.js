@@ -94,7 +94,7 @@ const fiftyfive = reverseAlgo(convertRuwixAlgo("rU'U'R'U'r'RRUR'U'rU'r'"));
 const fiftysix = reverseAlgo(convertRuwixAlgo("rUr'URU'R'URU'R'rU'r'"));
 const fiftyseven = reverseAlgo(convertRuwixAlgo("RUR'U'M'URU'r'"));
 
-
+const test = "r'U'rU'R'URU'R'URr'Ur";
 
 
 function reverseAlgo(string) {

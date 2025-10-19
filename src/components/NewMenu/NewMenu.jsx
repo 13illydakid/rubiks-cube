@@ -12,7 +12,13 @@ const NewMenu = (props) => {
       </button>
       {showOll && (
         // OLLPanel already positions itself; just toggle it here
-        <OLLPanel {...props} open={showOll} reload={props.reload} />
+        <OLLPanel
+          {...props}
+          open={showOll}
+          reload={props.reload}
+          playOne={props.playOne}
+          onClose={() => setShowOll(false)}
+        />
       )}
     </div>
   );

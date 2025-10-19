@@ -2,9 +2,11 @@
 .oll-panel {
   position: fixed;
   left: 10px;
-  top: 80px;
-  width: 340px;
-  max-height: 75vh;
+  top: 130px;
+  /* lowered so it won't cover the OLL button */
+  width: 520px;
+  /* wider to avoid side scroll */
+  max-height: 78vh;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid #007bff;
   border-radius: .25rem;
@@ -17,7 +19,7 @@
 .oll-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   margin-bottom: 6px;
 }
 
@@ -31,9 +33,33 @@
   opacity: .8;
 }
 
+.oll-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.oll-close {
+  border: 1px solid #007bff;
+  border-radius: .25rem;
+  background: rgba(255, 0, 0, .15);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  line-height: 24px;
+  text-align: center;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.oll-close:hover {
+  background: rgba(255, 0, 0, .3);
+}
+
 .oll-list {
   display: grid;
   grid-template-columns: 1fr;
+  /* single column */
   gap: 6px;
   max-height: 48vh;
   overflow-y: auto;
@@ -94,9 +120,10 @@
 }
 
 .oll-notation-view .steps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  /* exactly 6 columns; wraps to next row */
+  gap: 6px 8px;
 }
 
 .oll-notation-view .step {

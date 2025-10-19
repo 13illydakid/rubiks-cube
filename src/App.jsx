@@ -1704,6 +1704,7 @@ class App extends Component {
           beginScramble={this.beginScramble}
           beginSolve={this.beginSolve}
           stopSolve={this.stopSolve}
+          playOne={this.playOne}
           reload={this.reloadTurnedPieces}
         />
         {/* Always show OrientationPicker */}

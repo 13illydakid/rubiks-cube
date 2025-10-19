@@ -28,7 +28,7 @@ const OLLItem = ({ name, notation, selected, onSelect }) => {
 };
 
 const OLLPanel = (props) => {
-  const { state, setState, open, reload } = props;
+  const { state, setState, open, reload, playOne, onClose } = props;
   const cD = state.cubeDimension || 3;
 
   // Build OLL list for 3x3
@@ -41,9 +41,9 @@ const OLLPanel = (props) => {
   const [selected, setSelected] = useState(null); // { name, setupMovesArr, solveMovesArr }
   const [currentRun, setCurrentRun] = useState(null); // 'setup' | 'solve' | null
 
-  // Derive highlight index from App's solvedSetIndex when our run is active
+  // Derive highlight index from App's solvedSetIndex only during solve
   const highlightIndex = useMemo(() => {
-    if (!currentRun) return -1;
+    if (currentRun !== 'solve') return -1;
     return state.solvedSetIndex ?? -1;
   }, [state.solvedSetIndex, currentRun]);
 
@@ -54,66 +54,99 @@ const OLLPanel = (props) => {
     }
   }, [open]);
 
+  // Drive autoplay by nudging the engine to execute when a move is queued
+  useEffect(() => {
+    if (!open) return;
+    if (!state.autoPlay) return;
+    // Engine is idle when not currently animating a rotation (start > end)
+    const idle = state.start > state.end && !state.playOne;
+    if (idle && state.moveSet && state.moveSet.length) {
+      if (typeof playOne === 'function') {
+        playOne({ state, setState });
+      } else {
+        // Fallback: set playOne flag directly
+        setState({ playOne: true, prevSet: [...state.prevSet, state.moveSet[0]] });
+      }
+    }
+  }, [state.start, state.end, state.autoPlay, state.moveSet, state.playOne, open]);
+
   const prepareCase = (item) => {
     const setupMovesArr = splitMoves(item.moves);
     const solveMovesArr = invertMoves(setupMovesArr);
     setSelected({ name: item.name, setupMovesArr, solveMovesArr });
-    // Arrange cube into case by auto-running setup
-    setCurrentRun("setup");
-    // Reset to a solved cube using current orientation to ensure a consistent starting state
-    const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
-    setState({
-      currentFunc: "Algorithms",
-      rubiksObject: generated.tempArr,
-      moveSet: [...setupMovesArr],
-      solvedSet: [...setupMovesArr],
-      solvedSetIndex: 0,
-      prevSet: [],
-      autoPlay: true,
-      autoRewind: false,
-      autoTarget: false,
-      playOne: false,
-      jumpToEnd: false,
-    });
-    if (typeof reload === "function") reload('all');
+    // Do not start any moves on selection; wait for Run
+    setCurrentRun(null);
+    // If something was already running, stop it cleanly
+    setState({ autoPlay: false, playOne: false });
   };
 
   const runSolve = () => {
     if (!selected) return;
-    setCurrentRun("solve");
+    // Reset to solved and first run setup; when setup completes we'll auto-start solve
+    const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
+    setCurrentRun('setup');
     setState({
-      currentFunc: "Algorithms",
-      moveSet: [...selected.solveMovesArr],
+      currentFunc: 'Algorithms',
+      rubiksObject: generated.tempArr,
+      moveSet: [...selected.setupMovesArr],
+      // Keep solve moves in solvedSet for highlighting later
       solvedSet: [...selected.solveMovesArr],
       solvedSetIndex: 0,
       prevSet: [],
       autoPlay: true,
+      playOne: true,
       autoRewind: false,
       autoTarget: false,
-      playOne: false,
       jumpToEnd: false,
     });
+    if (typeof reload === 'function') reload('all');
   };
 
   const pause = () => setState({ autoPlay: false });
 
   const refreshCase = () => {
     if (!selected) return;
-    // Re-run setup from current cube state; simplest approach is to play setup again
-    setCurrentRun("setup");
+    // Re-run full chain from solved
+    const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
+    setCurrentRun('setup');
     setState({
-      currentFunc: "Algorithms",
+      currentFunc: 'Algorithms',
+      rubiksObject: generated.tempArr,
       moveSet: [...selected.setupMovesArr],
-      solvedSet: [...selected.setupMovesArr],
+      solvedSet: [...selected.solveMovesArr],
       solvedSetIndex: 0,
       prevSet: [],
       autoPlay: true,
+      playOne: true,
       autoRewind: false,
       autoTarget: false,
-      playOne: false,
       jumpToEnd: false,
     });
+    if (typeof reload === 'function') reload('all');
   };
+
+  // After setup completes, automatically start solve
+  useEffect(() => {
+    if (!open) return;
+    if (currentRun !== 'setup') return;
+    const idle = state.start > state.end && !state.playOne;
+    const setupDone = !state.moveSet || state.moveSet.length === 0;
+    if (idle && setupDone && selected) {
+      setCurrentRun('solve');
+      setState({
+        currentFunc: 'Algorithms',
+        moveSet: [...selected.solveMovesArr],
+        solvedSet: [...selected.solveMovesArr],
+        solvedSetIndex: 0,
+        prevSet: [],
+        autoPlay: true,
+        playOne: true,
+        autoRewind: false,
+        autoTarget: false,
+        jumpToEnd: false,
+      });
+    }
+  }, [open, currentRun, state.start, state.end, state.playOne, state.moveSet, selected, setState]);
 
   if (!open) return null;
 
@@ -121,7 +154,19 @@ const OLLPanel = (props) => {
     <div className="oll-panel" data-no-camera-reset>
       <div className="oll-header">
         <div className="oll-title-main">OLL (CFOP)</div>
-        <div className="oll-sub">3x3 cases: {ollList.length}</div>
+        <div className="oll-header-right">
+          <div className="oll-sub">3x3 cases: {ollList.length}</div>
+          <button
+            className="oll-close"
+            aria-label="Close OLL panel"
+            title="Close"
+            onClick={() => {
+              if (typeof onClose === 'function') onClose();
+            }}
+          >
+            ×
+          </button>
+        </div>
       </div>
       <div className="oll-list">
         {ollList.map((item) => (
