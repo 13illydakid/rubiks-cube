@@ -44,7 +44,7 @@ class Mobile extends Component {
   }
 
   render() {
-    const algoLength = algorithms.filter(set => set.worksFor.includes(this.props.state.cubeDimension)).length;
+  const algoLength = algorithms.length;
     function otherOptionClick(e, props) {
       switch (e.target.id) {
         case 'Reset':

@@ -75,10 +75,7 @@ const SolverUIFunctions = {
     let algoSet = [];
     let generated = cube.generateSolved(cD, cD, cD, "yellow", "red");
     if (algo !== "None Selected")
-      algoSet = algorithms
-        .find(
-          set => set.name === algo &&
-            set.worksFor.includes(cD)).moves.split(" ");
+      algoSet = (algorithms.find(set => set.name === algo) || { moves: '' }).moves.split(" ");
     props.setState({ activeAlgo: algo, moveSet: [...algoSet], rubiksObject: generated.tempArr, solveable: true, solvedSet: [...algoSet], solvedSetIndex: 0, prevSet: [], jumpToEnd: true });
   }
 }

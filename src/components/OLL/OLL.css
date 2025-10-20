@@ -83,11 +83,23 @@
 }
 
 .oll-notation {
+  /* display: grid;
+  grid-template-columns: repeat(6, minmax(max-content, 1fr)); */
+  /* max 6 per row, wraps to 2nd/3rd row */
+  display: flex;
+  justify-content: center;
+  gap: 4px 10px;
   font-family: monospace;
   font-size: .85rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.oll-token {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .35);
+  border: 1px solid rgba(255, 255, 255, .15);
+  justify-self: center;
+  /* size to content */
 }
 
 .oll-controls {

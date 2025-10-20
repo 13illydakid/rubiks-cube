@@ -244,9 +244,9 @@ class SolverUI extends Component {
                                                             <Row style={{paddingLeft:"15px"}}>
                                                                 {/* <label htmlFor="patterns" style={{color:"lightgrey"}}>Choose a Pattern:</label> */}
                                                                 <select style={{color:"lightgrey",backgroundColor:"#343a40"}} id="patterns" onChange={(e) => algoStart(e.target.value,this.props)}>
-                                                                    {algorithms.map(algo=>algo.worksFor.includes(this.props.state.cubeDimension)?
-                                                                            <option className="mobileAlgo" id={algo.name} value={algo.name} key={algo.name}>{algo.name}</option>
-                                                                                    :"")}
+                                                                    {algorithms.map(algo => (
+                                                                        <option className="mobileAlgo" id={algo.name} value={algo.name} key={algo.name}>{algo.name}</option>
+                                                                    ))}
                                                                 </select>
                                                             </Row>
                                                             <Row style={{paddingLeft:"15px"}}>

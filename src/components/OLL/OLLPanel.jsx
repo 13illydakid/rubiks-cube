@@ -1,5 +1,6 @@
-import React, { useMemo, useState, useEffect } from "react";
-import ollAlgorithms from "../../cubeFunctions/algorithms";
+  import React, { useMemo, useState, useEffect } from "react";
+import ollAlgorithms, { ollDisplay, OLLSetUP } from "../../cubeFunctions/algorithms";
+import moveFuncs from "../../cubeFunctions/move";
 import cube from "../../cubeFunctions/cube";
 import "./OLL.css";
 
@@ -18,11 +19,50 @@ const invertMoves = (movesArr) => {
   return inv;
 };
 
+// Group a notation string by parentheses blocks: text outside parentheses grouped together,
+// and each parenthesized block kept as a single element (including the parentheses).
+function groupByParens(str) {
+  const res = [];
+  let i = 0;
+  let outside = '';
+  while (i < str.length) {
+    const ch = str[i];
+    if (ch === '(') {
+      // push any pending outside text
+      if (outside.trim()) res.push(outside.trim());
+      outside = '';
+      // capture until matching ')'
+      let j = i + 1;
+      let depth = 1;
+      let block = '(';
+      while (j < str.length && depth > 0) {
+        const c = str[j];
+        block += c;
+        if (c === '(') depth++;
+        else if (c === ')') depth--;
+        j++;
+      }
+      res.push(block);
+      i = j;
+    } else {
+      outside += ch;
+      i++;
+    }
+  }
+  if (outside.trim()) res.push(outside.trim());
+  return res;
+}
+
 const OLLItem = ({ name, notation, selected, onSelect }) => {
+  const groups = useMemo(() => groupByParens(notation || ''), [notation]);
   return (
     <div className={"oll-item" + (selected ? " selected" : "")} onClick={onSelect}>
       <div className="oll-title">{name}</div>
-      <div className="oll-notation" title={notation}>{notation}</div>
+      <div className="oll-notation" title={notation}>
+        {groups.map((g, i) => (
+          <span key={i} className="oll-token">{g}</span>
+        ))}
+      </div>
     </div>
   );
 };
@@ -33,9 +73,23 @@ const OLLPanel = (props) => {
 
   // Build OLL list for 3x3
   const ollList = useMemo(() => {
-    return ollAlgorithms
-      .filter((a) => a.name?.startsWith("OLL-") && a.worksFor?.includes(3))
-      .map((a) => ({ name: a.name, moves: a.moves }));
+    // Use human-readable strings for display (from OLL object)
+    const display = (ollDisplay || []).filter((a) => a.name?.startsWith("OLL-"));
+    return display.map((a) => ({ name: a.name, moves: a.display }));
+  }, []);
+
+  // Map: OLL name -> engine-friendly move string from algorithms default export
+  const engineAlgoByName = useMemo(() => {
+    const map = new Map();
+    // generalizedBundle emits entries for sizes 3..N in order; keep first (3x3) for each name
+    (ollAlgorithms || []).forEach((a) => {
+      if (a && a.name && a.name.startsWith('OLL-') && a.moves) {
+        if (!map.has(a.name)) {
+          map.set(a.name, a.moves);
+        }
+      }
+    });
+    return map;
   }, []);
 
   const [selected, setSelected] = useState(null); // { name, setupMovesArr, solveMovesArr }
@@ -71,7 +125,9 @@ const OLLPanel = (props) => {
   }, [state.start, state.end, state.autoPlay, state.moveSet, state.playOne, open]);
 
   const prepareCase = (item) => {
-    const setupMovesArr = splitMoves(item.moves);
+    // Use engine-friendly sequence for playback
+    const engineMoves = engineAlgoByName.get(item.name) || '';
+    const setupMovesArr = splitMoves(engineMoves);
     const solveMovesArr = invertMoves(setupMovesArr);
     setSelected({ name: item.name, setupMovesArr, solveMovesArr });
     // Do not start any moves on selection; wait for Run
@@ -103,6 +159,76 @@ const OLLPanel = (props) => {
   };
 
   const pause = () => setState({ autoPlay: false });
+
+  // Apply setup instantly without animation by computing a new rubiksObject
+  const applySetupInstant = (ollName) => {
+    try {
+      const num = parseInt(String(ollName).replace('OLL-', ''), 10);
+      const setupStr = OLLSetUP && OLLSetUP[num];
+      const cDlocal = state.cubeDimension || 3;
+      const generated = cube.generateSolved(cDlocal, cDlocal, cDlocal, state.topFaceColor, state.frontFaceColor);
+      if (!setupStr) {
+        setState({ rubiksObject: generated.tempArr });
+        if (typeof reload === 'function') reload('all');
+        return;
+      }
+      // Basic sanitize: drop parentheses and x/y/z cube rotations; split tokens
+      const raw = setupStr.replace(/[()]/g, ' ').trim().split(/\s+/).filter(Boolean);
+      // Translate M/E/S into 3x3 equivalents (wide+face) for immediate application
+      const translated = [];
+      for (const t of raw) {
+        if (/^[xyz](2|'|)?$/i.test(t)) continue; // drop whole-cube rotations for setup
+        const m = t.match(/^(M|E|S)(2|')?$/i);
+        if (m) {
+          const kind = m[1].toUpperCase();
+          const suf = m[2] || '';
+          if (kind === 'M') {
+            if (suf === "'") translated.push("r'", "R");
+            else if (suf === '2') translated.push("r2", "R2");
+            else translated.push("r", "R'");
+          } else if (kind === 'E') {
+            if (suf === "'") translated.push("u'", "U");
+            else if (suf === '2') translated.push("u2", "U2");
+            else translated.push("u", "U'");
+          } else if (kind === 'S') {
+            if (suf === "'") translated.push("f'", "F");
+            else if (suf === '2') translated.push("f2", "F2");
+            else translated.push("f", "F'");
+          }
+        } else {
+          translated.push(t);
+        }
+      }
+      // Convert plain tokens to engine-prefixed tokens (01X, optional 2 or ')
+      const engineTokens = translated.map(tok => {
+        // already engine-style? keep
+        if (/^\d{2}[A-Za-z](2|'|)?$/.test(tok)) return tok;
+        // face or wide move with optional suffix
+        if (/^[FfRrUuLlDdBb](2|'|)?$/.test(tok)) return `01${tok}`;
+        return tok; // fallback
+      });
+      // Use move functions to apply synchronously
+      const moveArray = moveFuncs.moveStringToArray(engineTokens.join(' '));
+      let rubiksObject = generated.tempArr;
+      let tempState = {
+        cubeDimension: cDlocal,
+        blockMoveLog: true,
+        moveLog: '',
+        solveMoves: '',
+        end: 0,
+        solveState: -1,
+      };
+      while (moveArray.length) {
+        const data = moveFuncs.parseMoveArray(moveArray);
+        const obj = cube.rotateCubeFace(...data, tempState.blockMoveLog, tempState.moveLog, tempState.solveMoves, tempState.end, tempState.solveState);
+        rubiksObject = cube.rotateFace(obj.face, obj.turnDirection, obj.cubeDepth, obj.isMulti, cDlocal, rubiksObject);
+      }
+      setState({ rubiksObject, moveSet: [], prevSet: [], autoPlay: false, playOne: false });
+      if (typeof reload === 'function') reload('all');
+    } catch (e) {
+      // Fail-safe: do nothing on error
+    }
+  };
 
   const refreshCase = () => {
     if (!selected) return;
@@ -175,7 +301,7 @@ const OLLPanel = (props) => {
             name={item.name}
             notation={item.moves}
             selected={selected?.name === item.name}
-            onSelect={() => prepareCase(item)}
+            onSelect={(e) => { prepareCase(item); applySetupInstant(item.name); }}
           />
         ))}
       </div>
@@ -190,9 +316,13 @@ const OLLPanel = (props) => {
         <div className="oll-notation-view" data-no-camera-reset>
           <div className="label">Algorithm:</div>
           <div className="steps">
-            {selected.solveMovesArr.map((step, idx) => (
-              <span key={idx} className={idx === highlightIndex ? "step active" : "step"}>{step}</span>
-            ))}
+            {selected.solveMovesArr.map((step, idx) => {
+              // Remove numeric prefixes (first two digits) and any parentheses for visual display only
+              const pretty = String(step).replace(/^\d{2}/, '').replace(/[()]/g, '');
+              return (
+                <span key={idx} className={idx === highlightIndex ? "step active" : "step"}>{pretty}</span>
+              );
+            })}
           </div>
         </div>
       )}

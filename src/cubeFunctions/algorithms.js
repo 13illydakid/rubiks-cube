@@ -1,101 +1,124 @@
 const sizeLimit = 30;
-/*
-const cross = "01R 01R 01L' 01D 01F 01F 01R' 01D' 01R' 01L 01U' 01D 01R 01D 01B 01B 01R' 01U 01D 01D";
-const checkerboard = "01U 01U 01D 01D 01R 01R 01L 01L 01F 01F 01B 01B";
-const checkerboard1 = "01U' 01R 01R 01L 01L 01F 01F 01B 01B 01U' 01R 01L 01F 01B' 01U 01F 01F 01D 01D 01R 01R 01L 01L 01F 01F 01U 01U 01F 01F 01U' 01F 01F";
-const python = "01F 01F 01R' 01B' 01U 01R' 01L 01F' 01L 01F' 01B 01D' 01R 01B 01L 01L";
-const sixSpots = "01U 01D' 01R 01L' 01F 01B' 01U 01D'";
-const cubex3 = "01U' 01L' 01U' 01F' 01R 01R 01B' 01R 01F 01U 01B 01B 01U 01B' 01L 01U' 01F 01U 01R 01F'";
-const rings = "02R 03R 04R 05R 02B' 03B' 04B' 01L 01L 02F 02B 01L 01L 02B' 02D' 03D' 04D' 05D' 02F' 01L 01L 02F 02B 01L 01L 02B' 02D 02D 03D 03D 04D 04D 05D 05D 03R 04R 01U' 03R' 04R' 02D' 03D' 04D' 05D' 03R 04R 01U 02R' 03R' 04R' 05R' 03F' 04F' 03R' 04R' 03F 04F 02F 03F 04F 05F 02L 02L 03L 03L 04L 04L 02F 02F 03R 03R 04R 04R 02B 02B 03B 03B 04B 04B 02L 02L";
-const cubex4Twisted = "01B' 02R 02R 02L 02L 01U 01U 02R 02R 02L 02L 01B 01F 01F 01R 01U' 01R 01U 01R 01R 01U 01R 01R 01F' 01U 01F' 01U 02U 01L 02L 01U' 02U' 01F 01F 02F 02F 01D 02D 01R' 02R' 01U 02U 01F 02F 01D 01D 02D 02D 01R 01R 02R 02R";
-const cubex2 = "01F 01L 01F 01U' 01R 01U 01F 01F 01L 01L 01U' 01L' 01B 01D' 01B' 01L 01L 01U";
 
-//convertRuwixAlgo("".split(' ').join(''));
-const checkboardInCube = convertRuwixAlgo("BDF'B'DL2ULU'BD'RBRD'RL'FU2D");
-const perpendicularLines = convertRuwixAlgo("R2 U2 R2 U2 R2 U2 L2 D2 L2 D2 L2 D2 L2 R2".split(' ').join(''));
-const verticalStripes = convertRuwixAlgo("F U F R L2 B D' R D2 L D' B R2 L F U F".split(' ').join(''));
-const giftBox = convertRuwixAlgo("U B2 R2 B2 L2 F2 R2 D' F2 L2 B F' L F2 D U' R2 F' L' R'".split(' ').join(''));
-const twister = convertRuwixAlgo("F R' U L F' L' F U' R U L' U' L F'".split(' ').join(''));
-const spiral = convertRuwixAlgo("L' B' D U R U' R' D2 R2 D L D' L' R' F U".split(' ').join(''));
-const fourCrosses = convertRuwixAlgo("U2 R2 L2 F2 B2 D2 L2 R2 F2 B2".split(' ').join(''));
-const unionJack = convertRuwixAlgo("U F B' L2 U2 L2 F' B U2 L2 U".split(' ').join(''));
-const displaceMotif = convertRuwixAlgo("L2 B2 D' B2 D L2 U R2 D R2 B U R' F2 R U' B' U'".split(' ').join(''));
-const viaduct = convertRuwixAlgo("R2 U2 L2 D B2 L2 B2 R2 D' U L' D F' U' R2 F' U B2 U2 R'".split(' ').join(''));
-const staircase = convertRuwixAlgo("L2 F2 D' L2 B2 D' U' R2 B2 U' L' B2 L D L B' D L' U".split(' ').join(''));
-const wrapped2x2 = convertRuwixAlgo("D' B2 F2 L2 U' F2 R2 D F2 U2 L' B R' U' L' F D' F L D2".split(' ').join(''));
-const exchangedDuckFeet = convertRuwixAlgo("U F R2 F' D' R U B2 U2 F' R2 F D B2 R B'".split(' ').join(''));
-const pyraminx = convertRuwixAlgo("D L' U R' B' R B U2 D B D' B' L U D'".split(' ').join(''));
-const twinPeaks = convertRuwixAlgo("U L2 B2 R2 U R2 D' U L F' U L' D B' U L B' L R' U'".split(' ').join(''));
-const cornerPyramid = convertRuwixAlgo("U' D B R' F R B' L' F' B L F R' B' R F' U' D".split(' ').join(''));
-const sixTwoOne = convertRuwixAlgo("U B2 D2 L B' L' U' L' B D2 B2".split(' ').join(''));
-const yinYang = convertRuwixAlgo("R L B F R L U' D' F' B' U D".split(' ').join(''));
-const snakeEyes = convertRuwixAlgo("R2 U2 R2 U2 R2 U2".split(' ').join(''));
-const weirdo = convertRuwixAlgo("R' F' U F2 U' F R' F2 D2 F2 D2 F2 D F2 R2 U2".split(' ').join(''));
-*/
+const OLL = {
+  1: `(R U2 R') (R' F R F') U2 (R' F R F')`,
+  2: `F (R U R' U') F' f (R U R' U') f'`,
+  3: `f (R U R' U') f' U' F (R U R' U') F'`,
+  4: `f (R U R' U') f' U F (R U R' U') F'`,
+  5: `r' U2 (R U R' U) r`,
+  6: `r U2 R' U' R U' r'`,
+  7: `(r U R' U) R U2 r'`,
+  8: `r' U' R U' R' U2 r`,
+  9: `(R U R' U') R' F R2 U R' U' F'`,
+  10: `(R U R' U) (R' F R F') R U2 R'`,
+  11: `F' (L' U' L U) F y F (R U R' U') F'`,
+  12: `F (R U R' U') F' U F (R U R' U') F'`,
+  13: `F (U R U' R2) F' (R U R U' R')`,
+  14: `(R' F R) U (R' F' R) y' (R U' R')`,
+  15: `l' U' l (L' U' L U) l' U l`,
+  16: `r U r' (R U R' U') r U' r'`,
+  17: `(R U R' U) (R' F R F') U2 (R' F R F')`,
+  18: `F (R U R' U) y' R' U2 (R' F R F')`,
+  19: `M U (R U R' U') M' (R' F R F')`,
+  20: `M U (R U R' U') M2 (U R U' r')`,
+  21: `(R U R') U (R U' R') U (R U2 R')`,
+  22: `R U2 (R2' U' R2 U') (R2' U2 R)`,
+  23: `R2 D (R' U2 R) D' (R' U2 R')`,
+  24: `(r U R' U') (r' F R F')`,
+  25: `F' (r U R' U') (r' F R)`,
+  26: `(R U2 R') U' (R U' R')`,
+  27: `(R' U2 R) U (R' U R)`,
+  28: `M' U' M U2' M' U' M`,
+  29: `(R U R' U') R U' R' F' U' (F R U R')`,
+  30: `(L F' L' F) L' U2 L d (R U R')`,
+  31: `R' U' F U R U' R' F' R`,
+  32: `F U R U' F' r U R' U' r'`,
+  33: `(R U R' U') (R' F R F')`,
+  34: `(R U R' U') x D' R' U R U' D x'`,
+  35: `(R U2 R') (R' F R F') (R U2 R')`,
+  36: `(L' U' L U') (L' U L U) (L F' L' F)`,
+  37: `F R' F' R U R U' R'`,
+  38: `(R U R' U) (R U' R' U') (R' F R F')`,
+  39: `L F' (L' U' L U) F U' L'`,
+  40: `R' F (R U R' U') F' U R`,
+  41: `(R U R' U) R U2 R' F (R U R' U') F'`,
+  42: `(R' F R F') (R' F R F') (R U R' U') (R U R')`,
+  43: `f' (L' U' L U) f`,
+  44: `f (R U R' U') f'`,
+  45: `F (R U R' U') F'`,
+  46: `R' U' (R' F R F') U R`,
+  47: `F' (L' U' L U) (L' U' L U) F`,
+  48: `F (R U R' U') (R U R' U') F'`,
+  49: `(R' F R' F') R2 U2 y (R' F R F')`,
+  50: `R' F R2 B' R2' F' R2 B R'`,
+  51: `f (R U R' U') (R U R' U') f'`,
+  52: `(R U R' U) R d' R U' R' F'`,
+  53: `(l' U' L U') (L' U L U') L' U2 l`,
+  54: `(r U R' U) (R U' R' U) R U2' r'`,
+  55: `R U2 R2 (U' R U' R') U2 (F R F')`,
+  56: `F (R U R' U') R F' (r U R' U') r'`,
+  57: `(R U R' U') M' (U R U' r')`,
+}
 
-// const anaconda = reverseAlgo(convertRuwixAlgo("RU'U'R'R'FRF'UUR'FRF'"));
-// const one = convertRuwixAlgo("RU'U'R")
-const one = convertRuwixAlgo("RU'U'R'R'FRF'UUR'FRF'");
-
-const two = reverseAlgo(convertRuwixAlgo("FRUR'U'F'fRUR'U'f'"));
-const three = reverseAlgo(convertRuwixAlgo("fRUR'U'f'U'FRUR'U'F'"));
-const four = reverseAlgo(convertRuwixAlgo("fRUR'U'f'UFRUR'U'F'"));
-const five = reverseAlgo(convertRuwixAlgo("r'UURUR'Ur"));
-const six = reverseAlgo(convertRuwixAlgo("rU'U'R'U'RU'r'"));
-const seven = reverseAlgo(convertRuwixAlgo("rUR'URU'U'r'"));
-const eight = reverseAlgo(convertRuwixAlgo("r'u'RU'R'UUr"));
-const nine = reverseAlgo(convertRuwixAlgo("RUR'U'R'FRRUR'U'F'"));
-const ten = reverseAlgo(convertRuwixAlgo("RUR'UR'FRF'RU'U'R'"));
-const eleven = reverseAlgo(convertRuwixAlgo("r'RRUR'URU'U'R'UM'"));
-const twelve = reverseAlgo(convertRuwixAlgo("M'R'U'RU'R'UURU'M"));
-const thirteen = reverseAlgo(convertRuwixAlgo("fRURRU'R'URU'f'"));
-const fourteen = reverseAlgo(convertRuwixAlgo("R'FRUR'F'RFU'F'"));
-const fifteen = reverseAlgo(convertRuwixAlgo("r'U'rR'U'RUr'Ur"));
-const sixteen = reverseAlgo(convertRuwixAlgo("rUr'RUR'U'rU'r'"));
-const seventeen = reverseAlgo(convertRuwixAlgo("lU'l'fRRBR'UR'U'f'"));
-const eighteen = reverseAlgo(convertRuwixAlgo("rUR'URU'U'r'r'U'RU'R'UUr"));
-const nineteen = reverseAlgo(convertRuwixAlgo("r'RURUU'U'rR'R'FRF'"));
-const twenty = reverseAlgo(convertRuwixAlgo("rUR'U'M'M'URU'R'U'M'"));
-const twentyone = reverseAlgo(convertRuwixAlgo("RU'U'R'U'RUR'U'RU'R'"));
-const twentytwo = reverseAlgo(convertRuwixAlgo("RU'U'R'R'U'RRU'R'R'U'U'R"));
-const twentythree = reverseAlgo(convertRuwixAlgo("RRD'RU'U'R'DRU'U'R"));
-const twentyfour = reverseAlgo(convertRuwixAlgo("rUR'U'r'FRF'"));
-const twentyfive = reverseAlgo(convertRuwixAlgo("F'rUR'U'r'FR"));
-const twentysix = reverseAlgo(convertRuwixAlgo("RU'U'R'U'RU'R'"));
-const twentyseven = reverseAlgo(convertRuwixAlgo("RUR'URU'U'R'"));
-const twentyeight = reverseAlgo(convertRuwixAlgo("rUR'U'r'RURU'R'"));
-const twentynine = reverseAlgo(convertRuwixAlgo("RUR'U'RU'R'F'U'FRUR'"));
-const thirty = reverseAlgo(convertRuwixAlgo("fRURRU'U'URRU'R'f'"));
-const thirtyone = reverseAlgo(convertRuwixAlgo("r'F'UFrU'r'U'r"));
-const thirtytwo = reverseAlgo(convertRuwixAlgo("RUB'U'R'URBR'"));
-const thirtythree = reverseAlgo(convertRuwixAlgo("RUR'U'R'FRF'"));
-const thirtyfour = reverseAlgo(convertRuwixAlgo("RURRU'R'FRURU'F'"));
-const thirtyfive = reverseAlgo(convertRuwixAlgo("RU'U'R'R'FRF'RU'U'R'"));
-const thirtysix = reverseAlgo(convertRuwixAlgo("R'U'RU'R'URUlU'R'U"));
-const thirtyseven = reverseAlgo(convertRuwixAlgo("FRU'R'U'RUR'F'"));
-const thirtyeight = reverseAlgo(convertRuwixAlgo("RUR'URU'R'U'R'FRF'"));
-const thirtynine = reverseAlgo(convertRuwixAlgo("RUR'F'U'FURUUR'"));
-const forty = reverseAlgo(convertRuwixAlgo("R'FRUR'U'F'UR"));
-const fortyone = reverseAlgo(convertRuwixAlgo("RUR'URU'U'R'FRUR'U'F'"));
-const fortytwo = reverseAlgo(convertRuwixAlgo("R'U'RU'R'UURFRUR'U'F'"));
-const fortythree = reverseAlgo(convertRuwixAlgo("B'U'R'URB"));
-const fortyfour = reverseAlgo(convertRuwixAlgo("fRUR'U'f'"));
-const fortyfive = reverseAlgo(convertRuwixAlgo("FRUR'U'F'"));
-const fortysix = reverseAlgo(convertRuwixAlgo("R'U'R'FRF'UR"));
-const fortyseven = reverseAlgo(convertRuwixAlgo("b'U'R'URU'R'URb"));
-const fortyeight = reverseAlgo(convertRuwixAlgo("FRUR'U'RUR'U'F'"));
-const fortynine = reverseAlgo(convertRuwixAlgo("RB'R'R'FRRBR'R'F'R"));
-const fifty = reverseAlgo(convertRuwixAlgo("r'UrrU'r'r'U'rrUr'"));
-const fiftyone = reverseAlgo(convertRuwixAlgo("fRUR'U'RUR'U'f'"));
-const fiftytwo = reverseAlgo(convertRuwixAlgo("R'F'U'FU'RUR'UR"));
-const fiftythree = reverseAlgo(convertRuwixAlgo("r'UURUR'U'RUR'Ur"));
-const fiftyfour = reverseAlgo(convertRuwixAlgo("rU'U'R'U'RUR'U'RU'r'"));
-const fiftyfive = reverseAlgo(convertRuwixAlgo("rU'U'R'U'r'RRUR'U'rU'r'"));
-const fiftysix = reverseAlgo(convertRuwixAlgo("rUr'URU'R'URU'R'rU'r'"));
-const fiftyseven = reverseAlgo(convertRuwixAlgo("RUR'U'M'URU'r'"));
-
-const test = "r'U'rU'R'URU'R'URr'Ur";
-
+export const OLLSetUP = {
+  1: `F R' F' R U2 F R' F' R R U2 R'`,
+  2: `f U R U' R' f' F U R U' R' F'`,
+  3: `F U R U' R' F' U f U R U' R' f'`,
+  4: `F U R U' R' F' U' f U R U' R' f'`,
+  5: `r' U' R U' R' U2 r`,
+  6: `r U R' U R U2 r'`,
+  7: `r U2 R' U' R U' r'`,
+  8: `r' U2 R U R' U r`,
+  9: `F U R U' R2 F' R U R U' R'`,
+  10: `R U2 R' F R' F' R U' R U' R'`,
+  11: `F U R U' R' F' y' F' U' L' U L F`,
+  12: `F U R U' R' F' U' F U R U' R' F'`,
+  13: `R U R' U' R' F R2 U R' U' F'`,
+  14: `R U R' y R' F R U' R' F' R`,
+  15: `l' U' l U' L' U L l' U l`,
+  16: `r U r' U R U' R' r U' r'`,
+  17: `F R' F' R U2 F R' F' R U' R U' R'`,
+  18: `F R' F' R U2 R y U' R U' R' F'`,
+  19: `F R' F' R M U R U' R' U' M'`,
+  20: `r U R' U' M2 U R U' R' U' M'`,
+  21: `R U2 R' U' R U R' U' R U' R'`,
+  22: `R' U2 R2' U R2 U R2' U2 R'`,
+  23: `R U2 R D R' U2 R D' R2`,
+  24: `F R' F' r U R U' r'`,
+  25: `R' F' r U R U' r' F`,
+  26: `R U R' U R U2 R'`,
+  27: `R' U' R U' R' U2 R`,
+  28: `M' U M U2' M' U M`,
+  29: `R U' R' F' U F R U R' U R U' R'`,
+  30: `R U' R' d' L' U2 L F' L F L'`,
+  31: `R' F R U R' U' F' U R`,
+  32: `r U R U' r' F U R' U' F'`,
+  33: `F R' F' R U R U' R'`,
+  34: `x D' U R' U' R D x' U R U' R'`,
+  35: `R U2 R' F R' F' R R U2 R'`,
+  36: `F' L F L' U' L' U' L U L' U L`,
+  37: `R U R' U' R' F R F'`,
+  38: `F R' F' R U R U R' U' R U' R'`,
+  39: `L U F' U' L' U L F L'`,
+  40: `R' U' F U R U' R' F' R`,
+  41: `F U R U' R' F' R U2 R' U' R U' R'`,
+  42: `R U' R' U R U' R' F R' F' R F R' F' R`,
+  43: `f' U' L' U L f`,
+  44: `f U R U' R' f'`,
+  45: `F U R U' R' F'`,
+  46: `R' U' F R' F' R U R`,
+  47: `F' U' L' U L U' L' U L F`,
+  48: `F U R U' R' U R U' R' F'`,
+  49: `F R' F' R y' U2 R2 F R F' R`,
+  50: `R B' R2 F R2' B R2 F' R`,
+  51: `f U R U' R' U R U' R' f'`,
+  52: `F R U R' d R' U' R U' R'`,
+  53: `l' U2 L U L' U' L U L' U l`,
+  54: `r U2' R' U' R U R' U' R U' r'`,
+  55: `F R' F' U2 R U R' U R2 U2 R'`,
+  56: `r U R U' r' F R' U R U' R' F'`,
+  57: `r U R' U' M U R U' R'`
+}
 
 function reverseAlgo(string) {
   let array = string.split(" ").reverse();
@@ -114,17 +137,42 @@ function reverseAlgo(string) {
 }
 
 function convertRuwixAlgo(algoStr) {
-  return algoStr
-    .split('')
-    .map((char, i) =>
-      (char !== "'" && char !== "2") ?
-        " 01" + char :
-        char === "2" ?
-          " 01" + algoStr[i - 1] :
-          char
-    )
-    .join('')
-    .trim();
+  return algoStr.split('').map((char, i) =>
+    (char !== "'" && char !== "2") ? " 01" + char :
+      char === "2" ? " 01" + algoStr[i - 1] : char).join('').trim();
+}
+
+// Sanitize OLL display string for the engine: remove parentheses and cube rotations (x, y, z variants)
+function sanitizeOLLDisplay(str) {
+  // Remove parentheses; split into tokens; drop cube rotations like y, y', y2, x, z
+  const raw = str.replace(/[()]/g, ' ').trim().split(/\s+/).filter(Boolean);
+  const out = [];
+  for (const t of raw) {
+    // Skip whole-cube rotations for now (not natively supported in engine queue)
+    if (/^[xyz](2|'|)?$/i.test(t)) continue;
+    // Translate slice moves M/E/S into wide+face equivalents on 3x3
+    const m = t.match(/^(M|E|S)(2|')?$/i);
+    if (m) {
+      const kind = m[1].toUpperCase();
+      const suf = m[2] || '';
+      if (kind === 'M') {
+        if (suf === "'") out.push("r'", "R");
+        else if (suf === '2') out.push("r2", "R2");
+        else out.push("r", "R'");
+      } else if (kind === 'E') {
+        if (suf === "'") out.push("u'", "U");
+        else if (suf === '2') out.push("u2", "U2");
+        else out.push("u", "U'");
+      } else if (kind === 'S') {
+        if (suf === "'") out.push("f'", "F");
+        else if (suf === '2') out.push("f2", "F2");
+        else out.push("f", "F'");
+      }
+      continue;
+    }
+    out.push(t);
+  }
+  return out.join('');
 }
 
 // Removed unused bundle() helper
@@ -132,10 +180,7 @@ function convertRuwixAlgo(algoStr) {
 let blankBundle = (name) => {
   let cubeSizes = [];
   for (let i = 2; i <= sizeLimit; i++) cubeSizes.push(i);
-  return {
-    name: name,
-    worksFor: cubeSizes
-  }
+  return { name: name, worksFor: cubeSizes }
 }
 
 // let generalizedBundle = (name, moveSet, moveSet2, tempObj) => {
@@ -154,10 +199,8 @@ let generalizedBundle = (name, moveSet, moveSet2) => {
         name: algoName,
         moves: generalizerLower(i, moveSet, moveSet2),
         worksFor: [i],
-        // preSolve: tempObj ? tempObj : null,
       }
     );
-    // Interesting filter but all look the same, so disbaled
     if (i < -1) {
       sets.push({
         name: algoName + " (Inverse)",
@@ -166,7 +209,6 @@ let generalizedBundle = (name, moveSet, moveSet2) => {
       });
     }
   }
-
   return sets;
 }
 
@@ -183,8 +225,9 @@ let baseLower = (depth, moveSet) => {
   const moves = [];
   if (depth > 1) {
     moveSet.split(" ").forEach(e => moves.push(move(depth, e.substring(2).toLowerCase())));
-  }
-  else moveSet.split(" ").forEach(e => moves.push(move(depth, e.substring(2).toUpperCase())));
+  } else {
+    moveSet.split(" ").forEach(e => moves.push(move(depth, e.substring(2).toUpperCase())))
+  };
   return moves.join(" ");
 }
 
@@ -206,67 +249,26 @@ function move(depth, side) {
   return ((depth < 10 ? "0" : "") + depth + side);
 }
 
-let algorithms = [
-  blankBundle("None Selected"),
-  // ...generalizedBundle("Anaconda", anaconda),
-  ...generalizedBundle("OLL-1", one),
-  ...generalizedBundle("OLL-2", two),
-  ...generalizedBundle("OLL-3", three),
-  ...generalizedBundle("OLL-4", four),
-  ...generalizedBundle("OLL-5", five),
-  ...generalizedBundle("OLL-6", six),
-  ...generalizedBundle("OLL-7", seven),
-  ...generalizedBundle("OLL-8", eight),
-  ...generalizedBundle("OLL-9", nine),
-  ...generalizedBundle("OLL-10", ten),
-  ...generalizedBundle("OLL-11", eleven),
-  ...generalizedBundle("OLL-12", twelve),
-  ...generalizedBundle("OLL-13", thirteen),
-  ...generalizedBundle("OLL-14", fourteen),
-  ...generalizedBundle("OLL-15", fifteen),
-  ...generalizedBundle("OLL-16", sixteen),
-  ...generalizedBundle("OLL-17", seventeen),
-  ...generalizedBundle("OLL-18", eighteen),
-  ...generalizedBundle("OLL-19", nineteen),
-  ...generalizedBundle("OLL-20", twenty),
-  ...generalizedBundle("OLL-21", twentyone),
-  ...generalizedBundle("OLL-22", twentytwo),
-  ...generalizedBundle("OLL-23", twentythree),
-  ...generalizedBundle("OLL-24", twentyfour),
-  ...generalizedBundle("OLL-25", twentyfive),
-  ...generalizedBundle("OLL-26", twentysix),
-  ...generalizedBundle("OLL-27", twentyseven),
-  ...generalizedBundle("OLL-28", twentyeight),
-  ...generalizedBundle("OLL-29", twentynine),
-  ...generalizedBundle("OLL-30", thirty),
-  ...generalizedBundle("OLL-31", thirtyone),
-  ...generalizedBundle("OLL-32", thirtytwo),
-  ...generalizedBundle("OLL-33", thirtythree),
-  ...generalizedBundle("OLL-34", thirtyfour),
-  ...generalizedBundle("OLL-35", thirtyfive),
-  ...generalizedBundle("OLL-36", thirtysix),
-  ...generalizedBundle("OLL-37", thirtyseven),
-  ...generalizedBundle("OLL-38", thirtyeight),
-  ...generalizedBundle("OLL-39", thirtynine),
-  ...generalizedBundle("OLL-40", forty),
-  ...generalizedBundle("OLL-41", fortyone),
-  ...generalizedBundle("OLL-42", fortytwo),
-  ...generalizedBundle("OLL-43", fortythree),
-  ...generalizedBundle("OLL-44", fortyfour),
-  ...generalizedBundle("OLL-45", fortyfive),
-  ...generalizedBundle("OLL-46", fortysix),
-  ...generalizedBundle("OLL-47", fortyseven),
-  ...generalizedBundle("OLL-48", fortyeight),
-  ...generalizedBundle("OLL-49", fortynine),
-  ...generalizedBundle("OLL-50", fifty),
-  ...generalizedBundle("OLL-51", fiftyone),
-  ...generalizedBundle("OLL-52", fiftytwo),
-  ...generalizedBundle("OLL-53", fiftythree),
-  ...generalizedBundle("OLL-54", fiftyfour),
-  ...generalizedBundle("OLL-55", fiftyfive),
-  ...generalizedBundle("OLL-56", fiftysix),
-  ...generalizedBundle("OLL-57", fiftyseven),
+// Build algorithms by iterating the OLL object (1..57), sanitizing and converting for engine use
+let algorithms = [blankBundle("None Selected")];
 
-]
+for (let key in OLL) {
+  let value = OLL[key];
+  let newAlgorithm = convertRuwixAlgo(sanitizeOLLDisplay(value));
+  algorithms.push(...generalizedBundle(`OLL-${key}`, newAlgorithm));
+}
+    // const displayStr = OLL[num];
+    // const engineStr = convertRuwixAlgo(sanitizeOLLDisplay(displayStr));
+    // algorithms.push(...generalizedBundle(`OLL-${num}`, engineStr));
 
+console.log(algorithms[1]);
+// console.log("algorithms");
 export default algorithms;
+
+// Named export: human-readable OLL display list (3x3) using the OLL object above
+// This is used by the UI to show the exact notation strings without numeric prefixes.
+export const ollDisplay = Object.entries(OLL).map(([num, str]) => ({
+  name: `OLL-${num}`,
+  display: String(str).trim(),
+  worksFor: [3],
+}));

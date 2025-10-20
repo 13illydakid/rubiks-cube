@@ -12,7 +12,6 @@ const MenuOptionsUnified = (props) => {
   // Left group (Solver/Algorithms)
   const left = () => {
     const algorithmSet = algorithms
-      .filter((algo) => algo.worksFor.includes(state.cubeDimension))
       .map((algo) => (
         <button
           id={algo.name}
@@ -81,13 +80,13 @@ const MenuOptionsUnified = (props) => {
 
   function algoStart(e, props) {
     if (props.state.autoPlay || props.state.autoRewind || props.state.playOne) return;
-    const cD = props.state.cubeDimension;
+  const cD = props.state.cubeDimension;
     const algo = e.target.id;
     const algoSet = [];
     const generated = cube.generateSolved(cD, cD, cD, "yellow", "red");
     generated.preSolveArray = [];
     algorithms.forEach((entry) => {
-      if (entry.moves && entry.name === algo && entry.worksFor.includes(cD)) {
+      if (entry.moves && entry.name === algo) {
         algoSet.push(...entry.moves.split(" "));
       }
     });
