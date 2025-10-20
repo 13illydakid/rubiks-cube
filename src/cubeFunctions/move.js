@@ -2,30 +2,9 @@
 // Rotation applied (around the right-left axis):
 // Front -> Top, Top -> Back, Back -> Bottom, Bottom -> Front. Right/Left unchanged.
 
-// Base face index mapping used across the app:
+// Base face index mapping used across the app (standard orientation):
 // 0:F, 1:U, 2:R, 3:B, 4:L, 5:D
-const BASE_FACE_TO_INDEX = { F: 0, U: 1, R: 2, B: 3, L: 4, D: 5 };
-
-function rotateFacesX(mapping) {
-  // Use temp variables like iterative reversal to avoid overwriting
-  const rotated = { ...mapping };
-  const tmpFront = mapping.F;
-  const tmpTop = mapping.U;
-  const tmpBack = mapping.B;
-  const tmpBottom = mapping.D;
-  // Apply rotation: F->U, U->B, B->D, D->F
-  rotated.U = tmpFront;
-  rotated.B = tmpTop;
-  rotated.D = tmpBack;
-  rotated.F = tmpBottom;
-  // R/L unchanged
-  rotated.R = mapping.R;
-  rotated.L = mapping.L;
-  return rotated;
-}
-
-// Active mapping after rotation
-const FACE_TO_INDEX = rotateFacesX(BASE_FACE_TO_INDEX);
+const FACE_TO_INDEX = { F: 0, U: 1, R: 2, B: 3, L: 4, D: 5 };
 // Inverse index -> letter
 const INDEX_TO_FACE = Object.entries(FACE_TO_INDEX).reduce((acc, [letter, idx]) => {
   acc[idx] = letter;

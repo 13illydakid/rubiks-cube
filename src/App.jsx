@@ -1566,6 +1566,10 @@ class App extends Component {
                 this.setState({ obj });
               }
             }
+            // When no moves remain, exit Algorithms/Solving mode to re-enable free keybinds
+            else if (!this.state.playOne && (!this.state.moveSet || this.state.moveSet.length === 0)) {
+              this.setState({ currentFunc: "None", autoPlay: false });
+            }
           }
 
           else if (this.state.currentFunc === "Color Picker") {

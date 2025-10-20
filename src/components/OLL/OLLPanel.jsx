@@ -121,12 +121,13 @@ const OLLPanel = (props) => {
   const prepareCase = (item) => {
     // Use engine-friendly sequence for playback
     const engineMoves = engineAlgoByName.get(item.name) || '';
-    const setupMovesArr = splitMoves(engineMoves);
-    const solveMovesArr = invertMoves(setupMovesArr);
+    // console.log(`engineMoves: ${engineMoves}`);
+    const solveMovesArr = splitMoves(engineMoves);
+    // console.log(`setupMovesArr: ${setupMovesArr}`);
+    const setupMovesArr = invertMoves(solveMovesArr);
+    // console.log(`solveMovesArr: ${solveMovesArr}`);
     setSelected({ name: item.name, setupMovesArr, solveMovesArr });
-  // Do not start any moves on selection; keep cube solved
-    // If something was already running, stop it cleanly and reset to solved
-    const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
+    // Stop any running autoplay and trigger App-level Reset for a reliable solved state
     setState({
       autoPlay: false,
       playOne: false,
@@ -134,21 +135,18 @@ const OLLPanel = (props) => {
       prevSet: [],
       solvedSet: [],
       solvedSetIndex: 0,
-      rubiksObject: generated.tempArr,
-      currentFunc: 'None',
+      currentFunc: 'Reset',
     });
   };
 
   const runSolve = () => {
     if (!selected) return;
-    // Reset to solved and first run setup; when setup completes we'll auto-start solve
+    // Keep simple: start algorithm from a freshly solved cube state we create locally
     const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
-    setCurrentRun('setup');
     setState({
       currentFunc: 'Algorithms',
       rubiksObject: generated.tempArr,
       moveSet: [...selected.solveMovesArr],
-      // solvedSet is the same algorithm for highlighting
       solvedSet: [...selected.solveMovesArr],
       solvedSetIndex: 0,
       prevSet: [],
@@ -179,23 +177,16 @@ const OLLPanel = (props) => {
   // No setup preview or chain: OLLSetUP retained in algorithms for reference only
 
   const refreshCase = () => {
-    // Generate a fresh solved cube and clear queues; do not auto-start autoplay
-    const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
-    setCurrentRun(null);
+    // Trigger App-level Reset to ensure a safe solved state even mid-animation
     setState({
-      currentFunc: 'None',
-      rubiksObject: generated.tempArr,
-      moveSet: [],
-      solvedSet: [],
-      solvedSetIndex: 0,
-      prevSet: [],
       autoPlay: false,
       playOne: false,
-      autoRewind: false,
-      autoTarget: false,
-      jumpToEnd: false,
+      moveSet: [],
+      prevSet: [],
+      solvedSet: [],
+      solvedSetIndex: 0,
+      currentFunc: 'Reset',
     });
-    if (typeof reload === 'function') reload('all');
   };
 
   // No setup/solve chain effect
