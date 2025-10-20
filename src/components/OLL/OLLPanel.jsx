@@ -1,4 +1,4 @@
-  import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import ollAlgorithms, { ollDisplay, OLLSetUP } from "../../cubeFunctions/algorithms";
 import moveFuncs from "../../cubeFunctions/move";
 import cube from "../../cubeFunctions/cube";
@@ -93,19 +93,13 @@ const OLLPanel = (props) => {
   }, []);
 
   const [selected, setSelected] = useState(null); // { name, setupMovesArr, solveMovesArr }
-  const [currentRun, setCurrentRun] = useState(null); // 'setup' | 'solve' | null
+  // No setup/solve phases; we play algorithm only
 
   // Derive highlight index from App's solvedSetIndex only during solve
-  const highlightIndex = useMemo(() => {
-    if (currentRun !== 'solve') return -1;
-    return state.solvedSetIndex ?? -1;
-  }, [state.solvedSetIndex, currentRun]);
+  const highlightIndex = useMemo(() => state.solvedSetIndex ?? -1, [state.solvedSetIndex]);
 
   useEffect(() => {
-    if (!open) {
-      setSelected(null);
-      setCurrentRun(null);
-    }
+    if (!open) setSelected(null);
   }, [open]);
 
   // Drive autoplay by nudging the engine to execute when a move is queued
@@ -130,10 +124,19 @@ const OLLPanel = (props) => {
     const setupMovesArr = splitMoves(engineMoves);
     const solveMovesArr = invertMoves(setupMovesArr);
     setSelected({ name: item.name, setupMovesArr, solveMovesArr });
-    // Do not start any moves on selection; wait for Run
-    setCurrentRun(null);
-    // If something was already running, stop it cleanly
-    setState({ autoPlay: false, playOne: false });
+  // Do not start any moves on selection; keep cube solved
+    // If something was already running, stop it cleanly and reset to solved
+    const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
+    setState({
+      autoPlay: false,
+      playOne: false,
+      moveSet: [],
+      prevSet: [],
+      solvedSet: [],
+      solvedSetIndex: 0,
+      rubiksObject: generated.tempArr,
+      currentFunc: 'None',
+    });
   };
 
   const runSolve = () => {
@@ -144,8 +147,8 @@ const OLLPanel = (props) => {
     setState({
       currentFunc: 'Algorithms',
       rubiksObject: generated.tempArr,
-      moveSet: [...selected.setupMovesArr],
-      // Keep solve moves in solvedSet for highlighting later
+      moveSet: [...selected.solveMovesArr],
+      // solvedSet is the same algorithm for highlighting
       solvedSet: [...selected.solveMovesArr],
       solvedSetIndex: 0,
       prevSet: [],
@@ -160,90 +163,34 @@ const OLLPanel = (props) => {
 
   const pause = () => setState({ autoPlay: false });
 
-  // Apply setup instantly without animation by computing a new rubiksObject
-  const applySetupInstant = (ollName) => {
-    try {
-      const num = parseInt(String(ollName).replace('OLL-', ''), 10);
-      const setupStr = OLLSetUP && OLLSetUP[num];
-      const cDlocal = state.cubeDimension || 3;
-      const generated = cube.generateSolved(cDlocal, cDlocal, cDlocal, state.topFaceColor, state.frontFaceColor);
-      if (!setupStr) {
-        setState({ rubiksObject: generated.tempArr });
-        if (typeof reload === 'function') reload('all');
-        return;
-      }
-      // Basic sanitize: drop parentheses and x/y/z cube rotations; split tokens
-      const raw = setupStr.replace(/[()]/g, ' ').trim().split(/\s+/).filter(Boolean);
-      // Translate M/E/S into 3x3 equivalents (wide+face) for immediate application
-      const translated = [];
-      for (const t of raw) {
-        if (/^[xyz](2|'|)?$/i.test(t)) continue; // drop whole-cube rotations for setup
-        const m = t.match(/^(M|E|S)(2|')?$/i);
-        if (m) {
-          const kind = m[1].toUpperCase();
-          const suf = m[2] || '';
-          if (kind === 'M') {
-            if (suf === "'") translated.push("r'", "R");
-            else if (suf === '2') translated.push("r2", "R2");
-            else translated.push("r", "R'");
-          } else if (kind === 'E') {
-            if (suf === "'") translated.push("u'", "U");
-            else if (suf === '2') translated.push("u2", "U2");
-            else translated.push("u", "U'");
-          } else if (kind === 'S') {
-            if (suf === "'") translated.push("f'", "F");
-            else if (suf === '2') translated.push("f2", "F2");
-            else translated.push("f", "F'");
-          }
-        } else {
-          translated.push(t);
-        }
-      }
-      // Convert plain tokens to engine-prefixed tokens (01X, optional 2 or ')
-      const engineTokens = translated.map(tok => {
-        // already engine-style? keep
-        if (/^\d{2}[A-Za-z](2|'|)?$/.test(tok)) return tok;
-        // face or wide move with optional suffix
-        if (/^[FfRrUuLlDdBb](2|'|)?$/.test(tok)) return `01${tok}`;
-        return tok; // fallback
-      });
-      // Use move functions to apply synchronously
-      const moveArray = moveFuncs.moveStringToArray(engineTokens.join(' '));
-      let rubiksObject = generated.tempArr;
-      let tempState = {
-        cubeDimension: cDlocal,
-        blockMoveLog: true,
-        moveLog: '',
-        solveMoves: '',
-        end: 0,
-        solveState: -1,
-      };
-      while (moveArray.length) {
-        const data = moveFuncs.parseMoveArray(moveArray);
-        const obj = cube.rotateCubeFace(...data, tempState.blockMoveLog, tempState.moveLog, tempState.solveMoves, tempState.end, tempState.solveState);
-        rubiksObject = cube.rotateFace(obj.face, obj.turnDirection, obj.cubeDepth, obj.isMulti, cDlocal, rubiksObject);
-      }
-      setState({ rubiksObject, moveSet: [], prevSet: [], autoPlay: false, playOne: false });
-      if (typeof reload === 'function') reload('all');
-    } catch (e) {
-      // Fail-safe: do nothing on error
+  // Adjust autoplay speed. If currently running an algorithm, enqueue a speed change tuple
+  // understood by App.changeSpeed; otherwise, set speed immediately.
+  const applySpeed = (speed, rotationSpeed, name) => {
+    // When a function is active (Algorithms/Solving), the app consumes [speed, rotationSpeed, name]
+    // tuples from moveSet to change speed mid-run. Otherwise, set immediately.
+    if (state.currentFunc !== 'None' && (state.autoPlay || state.playOne)) {
+      setState({ moveSet: [[speed, rotationSpeed, name], ...state.moveSet] });
+    } else {
+      // Immediate change mimics changeSpeed's else-branch
+      setState({ currentSpeed: name, speed, start: speed, end: 0, rotationSpeed });
     }
   };
 
+  // No setup preview or chain: OLLSetUP retained in algorithms for reference only
+
   const refreshCase = () => {
-    if (!selected) return;
-    // Re-run full chain from solved
+    // Generate a fresh solved cube and clear queues; do not auto-start autoplay
     const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
-    setCurrentRun('setup');
+    setCurrentRun(null);
     setState({
-      currentFunc: 'Algorithms',
+      currentFunc: 'None',
       rubiksObject: generated.tempArr,
-      moveSet: [...selected.setupMovesArr],
-      solvedSet: [...selected.solveMovesArr],
+      moveSet: [],
+      solvedSet: [],
       solvedSetIndex: 0,
       prevSet: [],
-      autoPlay: true,
-      playOne: true,
+      autoPlay: false,
+      playOne: false,
       autoRewind: false,
       autoTarget: false,
       jumpToEnd: false,
@@ -251,28 +198,7 @@ const OLLPanel = (props) => {
     if (typeof reload === 'function') reload('all');
   };
 
-  // After setup completes, automatically start solve
-  useEffect(() => {
-    if (!open) return;
-    if (currentRun !== 'setup') return;
-    const idle = state.start > state.end && !state.playOne;
-    const setupDone = !state.moveSet || state.moveSet.length === 0;
-    if (idle && setupDone && selected) {
-      setCurrentRun('solve');
-      setState({
-        currentFunc: 'Algorithms',
-        moveSet: [...selected.solveMovesArr],
-        solvedSet: [...selected.solveMovesArr],
-        solvedSetIndex: 0,
-        prevSet: [],
-        autoPlay: true,
-        playOne: true,
-        autoRewind: false,
-        autoTarget: false,
-        jumpToEnd: false,
-      });
-    }
-  }, [open, currentRun, state.start, state.end, state.playOne, state.moveSet, selected, setState]);
+  // No setup/solve chain effect
 
   if (!open) return null;
 
@@ -301,15 +227,62 @@ const OLLPanel = (props) => {
             name={item.name}
             notation={item.moves}
             selected={selected?.name === item.name}
-            onSelect={(e) => { prepareCase(item); applySetupInstant(item.name); }}
+            onSelect={(e) => { prepareCase(item); }}
           />
         ))}
       </div>
 
       <div className="oll-controls">
-        <button className="oll-btn" onClick={runSolve} disabled={!selected}>Run</button>
-        <button className="oll-btn" onClick={pause} disabled={!selected}>Pause</button>
-        <button className="oll-btn" onClick={refreshCase} disabled={!selected}>Refresh</button>
+        <button
+          className="oll-btn"
+          onClick={() => {
+            // Toggle play/pause behavior
+            if (!selected) return;
+            if (state.autoPlay || state.playOne) {
+              // Pause
+              setState({ autoPlay: false, playOne: false });
+            } else {
+              // Play (resume or start). If there is already a queue, resume; otherwise start from solved
+              if (state.moveSet && state.moveSet.length) {
+                setState({ autoPlay: true, playOne: true });
+                // Log the current state's moveSet when play is pressed
+                try { console.log('Starting autoplay with moveSet:', state.moveSet); } catch {}
+              } else {
+                // Start algorithm-only from solved
+                const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
+                const nextMoveSet = selected ? [...selected.solveMovesArr] : [];
+                setState({
+                  currentFunc: 'Algorithms',
+                  rubiksObject: generated.tempArr,
+                  moveSet: nextMoveSet,
+                  solvedSet: selected ? [...selected.solveMovesArr] : [],
+                  solvedSetIndex: 0,
+                  prevSet: [],
+                  autoPlay: true,
+                  playOne: true,
+                  autoRewind: false,
+                  autoTarget: false,
+                  jumpToEnd: false,
+                });
+                if (typeof reload === 'function') reload('all');
+                try { console.log('Starting autoplay with moveSet:', nextMoveSet); } catch {}
+              }
+            }
+          }}
+          disabled={!selected}
+        >
+          {(state.autoPlay || state.playOne) ? 'Pause' : 'Play'}
+        </button>
+        <button className="oll-btn" onClick={refreshCase}>Refresh</button>
+      </div>
+
+      {/* Lightweight speed presets focused on slowing autoplay; can adjust mid-run */}
+      <div className="oll-speed-controls">
+        <span className="label">Speed:</span>
+        <button className="oll-btn" onClick={() => applySpeed(1.5, 1050, 'Slowest')}>Slowest</button>
+        <button className="oll-btn" onClick={() => applySpeed(3, 750, 'Slower')}>Slower</button>
+        <button className="oll-btn" onClick={() => applySpeed(5, 500, 'Slow')}>Slow</button>
+        <button className="oll-btn" onClick={() => applySpeed(7.5, 350, 'Medium')}>Medium</button>
       </div>
 
       {selected && (
