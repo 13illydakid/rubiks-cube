@@ -1,8 +1,22 @@
 import React, { useMemo, useState, useEffect } from "react";
-import ollAlgorithms, { ollDisplay, OLLSetUP } from "../../cubeFunctions/algorithms";
-import moveFuncs from "../../cubeFunctions/move";
+import ollAlgorithms, { ollDisplay } from "../../cubeFunctions/algorithms";
 import cube from "../../cubeFunctions/cube";
 import "./OLL.css";
+
+// Preload OLL case images (1.png ... 57.png)
+const ollImageModules = import.meta.glob("../../assets/oll/*.png", { eager: true, import: 'default' });
+const ollImageByNumber = (() => {
+  const map = new Map();
+  for (const path in ollImageModules) {
+    const filename = path.split('/').pop(); // e.g., '12.png'
+    const base = filename?.split('.')?.[0] || '';
+    const num = parseInt(base, 10);
+    if (!Number.isNaN(num)) {
+      map.set(String(num), ollImageModules[path]);
+    }
+  }
+  return map;
+})();
 
 // Helper: split a space-delimited moves string into an array of tokens
 const splitMoves = (movesStr) => (movesStr || "").trim().split(/\s+/).filter(Boolean);
@@ -55,14 +69,29 @@ function groupByParens(str) {
 
 const OLLItem = ({ name, notation, selected, onSelect }) => {
   const groups = useMemo(() => groupByParens(notation || ''), [notation]);
+  // Determine the per-case thumbnail based on name 'OLL-<n>'
+  const thumbSrc = useMemo(() => {
+    const numStr = String(name || '').replace(/^OLL-/i, '');
+    return ollImageByNumber.get(numStr) || null;
+  }, [name]);
   return (
     <div className={"oll-item" + (selected ? " selected" : "")} onClick={onSelect}>
-      <div className="oll-title">{name}</div>
-      <div className="oll-notation" title={notation}>
-        {groups.map((g, i) => (
-          <span key={i} className="oll-token">{g}</span>
-        ))}
+      <div className="oll-item-container">
+        {thumbSrc ? (
+          <img className="oll-thumb" src={thumbSrc} alt={`${name} diagram`} loading="lazy" />
+        ) : (
+          <div className="oll-thumb oll-thumb--placeholder" aria-hidden="true" />
+        )}
+        <div className="oll-title-notation-container">
+          <div className="oll-title">{name}</div>
+          <div className="oll-notation" title={notation}>
+            {groups.map((g, i) => (
+              <span key={i} className="oll-token">{g}</span>
+            ))}
+          </div>
+        </div>
       </div>
+
     </div>
   );
 };
@@ -97,6 +126,8 @@ const OLLPanel = (props) => {
 
   // Derive highlight index from App's solvedSetIndex only during solve
   const highlightIndex = useMemo(() => state.solvedSetIndex ?? -1, [state.solvedSetIndex]);
+
+  // No selected-case diagram needed anymore
 
   useEffect(() => {
     if (!open) setSelected(null);
@@ -277,16 +308,18 @@ const OLLPanel = (props) => {
       </div>
 
       {selected && (
-        <div className="oll-notation-view" data-no-camera-reset>
-          <div className="label">Algorithm:</div>
-          <div className="steps">
-            {selected.solveMovesArr.map((step, idx) => {
-              // Remove numeric prefixes (first two digits) and any parentheses for visual display only
-              const pretty = String(step).replace(/^\d{2}/, '').replace(/[()]/g, '');
-              return (
-                <span key={idx} className={idx === highlightIndex ? "step active" : "step"}>{pretty}</span>
-              );
-            })}
+        <div className="oll-detail" data-no-camera-reset>
+          <div className="oll-notation-view">
+            <div className="label">Algorithm:</div>
+            <div className="steps">
+              {selected.solveMovesArr.map((step, idx) => {
+                // Remove numeric prefixes (first two digits) and any parentheses for visual display only
+                const pretty = String(step).replace(/^\d{2}/, '').replace(/[()]/g, '');
+                return (
+                  <span key={idx} className={idx === highlightIndex ? "step active" : "step"}>{pretty}</span>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

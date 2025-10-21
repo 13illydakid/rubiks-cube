@@ -77,9 +77,42 @@
   background: rgba(0, 128, 255, .20);
 }
 
+/* removed old flex-based item container and ad-hoc img size; using grid-based layout below */
+
 .oll-title {
   font-weight: 600;
   margin-bottom: 4px;
+  text-align: center;
+}
+
+/* Align items with a fixed-size thumbnail at left */
+.oll-item-container {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  /* fixed thumb width */
+  align-items: center;
+  gap: 10px;
+}
+
+.oll-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .25);
+  border: 1px solid rgba(255, 255, 255, .15);
+}
+
+.oll-thumb--placeholder {
+  opacity: .4;
+}
+
+.oll-title-notation-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* vertically center title+notation against thumb */
 }
 
 .oll-notation {
@@ -88,6 +121,7 @@
   /* max 6 per row, wraps to 2nd/3rd row */
   display: flex;
   justify-content: center;
+  /* center directly below the title */
   gap: 4px 10px;
   font-family: monospace;
   font-size: .85rem;
@@ -98,7 +132,7 @@
   border-radius: 3px;
   background: rgba(0, 0, 0, .35);
   border: 1px solid rgba(255, 255, 255, .15);
-  justify-self: center;
+  /* justify-self: center; */
   /* size to content */
 }
 
@@ -149,4 +183,19 @@
 .oll-notation-view .step.active {
   background: rgba(0, 128, 255, .35);
   border-color: #007bff;
+}
+
+/* OLL selected detail: notation-only */
+.oll-detail {
+  margin-top: 8px;
+}
+
+.oll-detail .oll-notation-view {
+  margin-top: 0;
+}
+
+.oll-detail .steps {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px 8px;
 }
