@@ -157,17 +157,25 @@ const OLLPanel = (props) => {
     // console.log(`setupMovesArr: ${setupMovesArr}`);
     const setupMovesArr = invertMoves(solveMovesArr);
     // console.log(`solveMovesArr: ${solveMovesArr}`);
-    setSelected({ name: item.name, setupMovesArr, solveMovesArr });
-    // Stop any running autoplay and trigger App-level Reset for a reliable solved state
+  setSelected({ name: item.name, setupMovesArr, solveMovesArr, displayStr: item.moves });
+    // Immediately initiate autoplay to "set up" the case from a solved cube using moveSet (setup/inverted moves)
+    const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
     setState({
-      autoPlay: false,
-      playOne: false,
-      moveSet: [],
-      prevSet: [],
-      solvedSet: [],
+      currentFunc: 'Algorithms',
+      rubiksObject: generated.tempArr,
+      // Use setup/inverted moves to create the OLL case on the cube
+      moveSet: [...setupMovesArr],
+      // Keep the forward algorithm for display/highlight and later Play
+      solvedSet: [...solveMovesArr],
       solvedSetIndex: 0,
-      currentFunc: 'Reset',
+      prevSet: [],
+      autoPlay: true,
+      playOne: true,
+      autoRewind: false,
+      autoTarget: false,
+      jumpToEnd: false,
     });
+    if (typeof reload === 'function') reload('all');
   };
 
   const runSolve = () => {
@@ -177,7 +185,7 @@ const OLLPanel = (props) => {
     setState({
       currentFunc: 'Algorithms',
       rubiksObject: generated.tempArr,
-      moveSet: [...selected.solveMovesArr],
+      moveSet: [...selected.setupMovesArr],
       solvedSet: [...selected.solveMovesArr],
       solvedSetIndex: 0,
       prevSet: [],
@@ -268,15 +276,18 @@ const OLLPanel = (props) => {
               if (state.moveSet && state.moveSet.length) {
                 setState({ autoPlay: true, playOne: true });
                 // Log the current state's moveSet when play is pressed
-                try { console.log('Starting autoplay with moveSet:', state.moveSet); } catch {}
+                try {
+                  console.log('Starting autoplay with moveSet:', state.moveSet);
+                  console.log('Starting autoplay with solveSet:', state.solvedSet);
+                } catch {}
               } else {
-                // Start algorithm-only from solved
-                const generated = cube.generateSolved(cD, cD, cD, state.topFaceColor, state.frontFaceColor);
-                const nextMoveSet = selected ? [...selected.solveMovesArr] : [];
+                // Start the forward algorithm (solvedSet) from the current cube state
+                // At this point, selecting a case has already set the cube into the OLL case by running setup moves.
+                const nextSolveSet = selected ? [...selected.solveMovesArr] : [];
                 setState({
                   currentFunc: 'Algorithms',
-                  rubiksObject: generated.tempArr,
-                  moveSet: nextMoveSet,
+                  moveSet: nextSolveSet,
+                  // Keep solvedSet for highlighting; we can reuse the same array
                   solvedSet: selected ? [...selected.solveMovesArr] : [],
                   solvedSetIndex: 0,
                   prevSet: [],
@@ -286,8 +297,7 @@ const OLLPanel = (props) => {
                   autoTarget: false,
                   jumpToEnd: false,
                 });
-                if (typeof reload === 'function') reload('all');
-                try { console.log('Starting autoplay with moveSet:', nextMoveSet); } catch {}
+                try { console.log('Starting autoplay with solveSet as moveSet:', nextSolveSet); } catch {}
               }
             }
           }}
@@ -307,22 +317,73 @@ const OLLPanel = (props) => {
         <button className="oll-btn" onClick={() => applySpeed(7.5, 350, 'Medium')}>Medium</button>
       </div>
 
-      {selected && (
+      {selected && (() => {
+        // Display the original OLL notation exactly (with parentheses and x/y/z), and
+        // map engine step index to display token index for highlighting.
+  const size = state.cubeDimension || 3;
+  const raw = String(selected.displayStr || '').replace(/\(/g, ' ( ').replace(/\)/g, ' ) ').trim();
+        const tokens = raw.length ? raw.split(/\s+/) : [];
+  // console.log("tokens:", tokens);
+        const displayTokens = [];
+        const engineIdxToDisplayIdx = [];
+        const pushMap = (count) => { for (let i = 0; i < count; i++) engineIdxToDisplayIdx.push(displayTokens.length); };
+
+        const isParen = (t) => t === '(' || t === ')';
+        const rotMatch = (t) => t.match(/^([xyz])(2|'|)?$/i);
+  const sliceMatch = (t) => t.match(/^([MES])((2')|2|'|)?$/i);
+  const moveMatch = (t) => t.match(/^([RULDBFruldbf])((2')|2|'|)?$/);
+
+        tokens.forEach((t) => {
+          if (!t) return;
+          const rot = rotMatch(t);
+          const sl = sliceMatch(t);
+          const mv = moveMatch(t);
+          if (isParen(t)) {
+            // Skip displaying parentheses tokens
+            return;
+          }
+          // Push visible token, then map engine steps for it
+          displayTokens.push(t);
+          if (rot) {
+            // Whole-cube rotation counts as one engine token (two if 2)
+            const raw = rot[2] || '';
+            const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+            if (suf === '2') pushMap(2);
+            else pushMap(1);
+          } else if (sl) {
+            // Slice is a single engine token (two if 2)
+            const raw = sl[2] || '';
+            const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+            if (suf === '2') pushMap(2);
+            else pushMap(1);
+          } else if (mv) {
+            // Standard face move; "2" is two tokens, otherwise one
+            const raw = mv[2] || '';
+            const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+            if (suf === '2') pushMap(2);
+            else pushMap(1);
+          } else {
+            // Unknown token: do not map
+          }
+        });
+
+        const dispIdx = engineIdxToDisplayIdx[state.solvedSetIndex] ?? -1;
+        return (
         <div className="oll-detail" data-no-camera-reset>
           <div className="oll-notation-view">
             <div className="label">Algorithm:</div>
             <div className="steps">
-              {selected.solveMovesArr.map((step, idx) => {
-                // Remove numeric prefixes (first two digits) and any parentheses for visual display only
-                const pretty = String(step).replace(/^\d{2}/, '').replace(/[()]/g, '');
+              {displayTokens.map((tok, idx) => {
+                const active = idx === dispIdx;
                 return (
-                  <span key={idx} className={idx === highlightIndex ? "step active" : "step"}>{pretty}</span>
+                  <span key={idx} className={active ? "step active" : "step"}>{tok}</span>
                 );
               })}
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

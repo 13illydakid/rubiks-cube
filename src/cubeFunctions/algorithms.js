@@ -2,7 +2,6 @@ const sizeLimit = 30;
 
 const OLL = {
   1: `(R U2 R') (R' F R F') U2 (R' F R F')`,
-  2: `F (R U R' U') F' f (R U R' U') f'`,
   3: `f (R U R' U') f' U' F (R U R' U') F'`,
   4: `f (R U R' U') f' U F (R U R' U') F'`,
   5: `r' U2 (R U R' U) r`,
@@ -14,26 +13,9 @@ const OLL = {
   11: `F' (L' U' L U) F y F (R U R' U') F'`,
   12: `F (R U R' U') F' U F (R U R' U') F'`,
   13: `F (U R U' R2) F' (R U R U' R')`,
-  14: `(R' F R) U (R' F' R) y' (R U' R')`,
   15: `l' U' l (L' U' L U) l' U l`,
   16: `r U r' (R U R' U') r U' r'`,
   17: `(R U R' U) (R' F R F') U2 (R' F R F')`,
-  18: `F (R U R' U) y' R' U2 (R' F R F')`,
-  19: `M U (R U R' U') M' (R' F R F')`,
-  20: `M U (R U R' U') M2 (U R U' r')`,
-  21: `(R U R') U (R U' R') U (R U2 R')`,
-  22: `R U2 (R2' U' R2 U') (R2' U2 R)`,
-  23: `R2 D (R' U2 R) D' (R' U2 R')`,
-  24: `(r U R' U') (r' F R F')`,
-  25: `F' (r U R' U') (r' F R)`,
-  26: `(R U2 R') U' (R U' R')`,
-  27: `(R' U2 R) U (R' U R)`,
-  28: `M' U' M U2' M' U' M`,
-  29: `(R U R' U') R U' R' F' U' (F R U R')`,
-  30: `(L F' L' F) L' U2 L d (R U R')`,
-  31: `R' U' F U R U' R' F' R`,
-  32: `F U R U' F' r U R' U' r'`,
-  33: `(R U R' U') (R' F R F')`,
   34: `(R U R' U') x D' R' U R U' D x'`,
   35: `(R U2 R') (R' F R F') (R U2 R')`,
   36: `(L' U' L U') (L' U L U) (L F' L' F)`,
@@ -120,16 +102,35 @@ export const OLLSetUP = {
   57: `r U R' U' M U R U' R'`
 }
 
+// Fallback helper: return display string for a given OLL id ("1".."57").
+// Prefer OLL[id]; if missing, derive by inverting the setup algorithm.
+function getOLLDisplayString(id) {
+  const key = String(id);
+  const disp = OLL[key];
+  if (disp && typeof disp === 'string') return disp;
+  const setup = OLLSetUP[key];
+  if (setup && typeof setup === 'string') return reverseAlgo(setup);
+  return '';
+}
+
 function reverseAlgo(string) {
   let array = string.split(" ").reverse();
   for (let i = 0; i < array.length; i++) {
     let tempStr = array[i];
-    let lastChar = tempStr[tempStr.length - 1];
-    let copyStr;
-    if (lastChar === "'") {
-      copyStr = tempStr.slice(0, tempStr.length - 1);
+    let copyStr = tempStr;
+    if (!tempStr) { array[i] = copyStr; continue; }
+    // Normalize any accidental 2' to just 2
+    if (/2'$/.test(tempStr)) {
+      copyStr = tempStr.replace(/2'$/, '2');
+    } else if (tempStr.endsWith("'")) {
+      // Remove prime if present
+      copyStr = tempStr.slice(0, -1);
+    } else if (tempStr.endsWith('2')) {
+      // Half turns are self-inverse: leave as-is
+      copyStr = tempStr;
     } else {
-      copyStr = tempStr.slice() + "'";
+      // Add prime for quarter turns without prime
+      copyStr = tempStr + "'";
     }
     array[i] = copyStr;
   }
@@ -137,42 +138,188 @@ function reverseAlgo(string) {
 }
 
 function convertRuwixAlgo(algoStr) {
-  return algoStr.split('').map((char, i) =>
-    (char !== "'" && char !== "2") ? " 01" + char :
-      char === "2" ? " 01" + algoStr[i - 1] : char).join('').trim();
+  if (!algoStr || typeof algoStr !== 'string') return '';
+  const out = [];
+  for (let i = 0; i < algoStr.length; i++) {
+    const ch = algoStr[i];
+    // Only process letters; skip anything else (quotes handled as suffix below)
+    if (/[A-Za-z]/.test(ch)) {
+      // Determine depth by case: lowercase => wide => depth 02 on 3x3
+      const depth = ch === ch.toLowerCase() ? '02' : '01';
+      // Peek for optional suffix: 2 or '
+      let suf = '';
+      if (i + 1 < algoStr.length && (algoStr[i + 1] === "'" || algoStr[i + 1] === '2')) {
+        suf = algoStr[i + 1];
+        i += 1;
+      }
+
+      if (suf === '2') {
+        // Two quarter-turns
+        out.push(`${depth}${ch}`);
+        out.push(`${depth}${ch}`);
+      } else {
+        // Prime or normal
+        out.push(`${depth}${ch}${suf === "'" ? "'" : ''}`);
+      }
+    }
+  }
+  return out.join(' ').trim();
 }
 
 // Sanitize OLL display string for the engine: remove parentheses and cube rotations (x, y, z variants)
 function sanitizeOLLDisplay(str) {
-  // Remove parentheses; split into tokens; drop cube rotations like y, y', y2, x, z
+  if (!str) return '';
+  // Tokenize by spaces, drop parentheses characters
   const raw = str.replace(/[()]/g, ' ').trim().split(/\s+/).filter(Boolean);
-  const out = [];
-  for (const t of raw) {
-    // Skip whole-cube rotations for now (not natively supported in engine queue)
-    if (/^[xyz](2|'|)?$/i.test(t)) continue;
-    // Translate slice moves M/E/S into wide+face equivalents on 3x3
-    const m = t.match(/^(M|E|S)(2|')?$/i);
+
+  // Accumulate whole-cube rotations as an ordered sequence (non-commutative)
+  const rotSeq = [];
+  const pushRot = (axis, count) => { for (let i = 0; i < ((count % 4) + 4) % 4; i++) rotSeq.push(axis); };
+
+  const applySingle = (ch, axis) => {
+    const isLower = ch === ch.toLowerCase();
+    let u = ch.toUpperCase();
+    const mapX = { F: 'U', U: 'B', B: 'D', D: 'F', R: 'R', L: 'L' };
+    const mapY = { F: 'R', R: 'B', B: 'L', L: 'F', U: 'U', D: 'D' };
+    const mapZ = { U: 'R', R: 'D', D: 'L', L: 'U', F: 'F', B: 'B' };
+    if (axis === 'x') u = mapX[u] || u;
+    else if (axis === 'y') u = mapY[u] || u;
+    else if (axis === 'z') u = mapZ[u] || u;
+    return isLower ? u.toLowerCase() : u;
+  };
+
+  const applyRotations = (letter) => rotSeq.reduce((acc, ax) => applySingle(acc, ax), letter);
+
+  // Expand a token to 1+ tokens with rotations applied
+  const expandToken = (tok) => {
+    // Normalize any 2' suffix to just 2
+    if (/2'$/.test(tok)) tok = tok.replace(/2'$/, '2');
+    // Cube rotations x/y/z with optional suffix
+    const rot = tok.match(/^[xyz]((2')|2|'|)?$/i);
+    if (rot) {
+      const axis = rot[0][0].toLowerCase();
+      const raw = rot[1] || '';
+      const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+      if (suf === "'") pushRot(axis, 3);
+      else if (suf === '2') pushRot(axis, 2);
+      else pushRot(axis, 1);
+      return [];
+    }
+
+    // Slice moves M/E/S
+    const m = tok.match(/^(M|E|S)((2')|2|'|)?$/i);
     if (m) {
       const kind = m[1].toUpperCase();
-      const suf = m[2] || '';
+      const raw = m[2] || '';
+      const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+      let exp = [];
       if (kind === 'M') {
-        if (suf === "'") out.push("r'", "R");
-        else if (suf === '2') out.push("r2", "R2");
-        else out.push("r", "R'");
+        exp = (suf === "'") ? ["r'", "R"] : (suf === '2') ? ["r2", "R2"] : ["r", "R'"];
       } else if (kind === 'E') {
-        if (suf === "'") out.push("u'", "U");
-        else if (suf === '2') out.push("u2", "U2");
-        else out.push("u", "U'");
+        exp = (suf === "'") ? ["u'", "U"] : (suf === '2') ? ["u2", "U2"] : ["u", "U'"];
       } else if (kind === 'S') {
-        if (suf === "'") out.push("f'", "F");
-        else if (suf === '2') out.push("f2", "F2");
-        else out.push("f", "F'");
+        exp = (suf === "'") ? ["f'", "F"] : (suf === '2') ? ["f2", "F2"] : ["f", "F'"];
+      }
+      // Apply rotations to each sub-token
+      return exp.map((e) => {
+        const face = e[0];
+        const suf2 = e.slice(1); // '', "'", or '2'
+        const mapped = applyRotations(face);
+        return mapped + suf2;
+      });
+    }
+
+    // Regular face move (with optional suffix), apply rotations
+    const mv = tok.match(/^([RULDBF](2'?|')|[rudlbf](2'?|'))$/);
+    if (mv) {
+      const face = tok[0];
+      const suf = tok.slice(1);
+      const mapped = applyRotations(face);
+      return [mapped + suf];
+    }
+
+    // Unknown token; keep as-is
+    return [tok];
+  };
+
+  const expanded = [];
+  for (const t of raw) {
+    const parts = expandToken(t);
+    if (parts && parts.length) expanded.push(...parts);
+  }
+  // Join without spaces for convertRuwixAlgo, which scans char-by-char with suffixes
+  return expanded.join('');
+}
+
+// Build size-aware engine tokens for OLL (handles x/y/z as whole-cube turns, and M/E/S on 3x3)
+function twoDigit(n) { return (n < 10 ? '0' : '') + n; }
+
+function convertOLLForSize(str, size) {
+  if (!str) return '';
+  const out = [];
+  const toks = String(str).replace(/[()]/g, ' ').trim().split(/\s+/).filter(Boolean);
+
+  const emitFace = (face, suf, depth) => {
+    const d = twoDigit(depth);
+    if (suf === "2") { out.push(`${d}${face}`); out.push(`${d}${face}`); }
+    else if (suf === "'") out.push(`${d}${face}'`);
+    else out.push(`${d}${face}`);
+  };
+
+  const axisToWide = (axis) => axis === 'x' ? 'r' : axis === 'y' ? 'u' : 'f';
+
+  for (const t of toks) {
+    // Whole-cube rotations
+    const rot = t.match(/^([xyz])((2')|2|'|)?$/i);
+    if (rot) {
+      const axis = rot[1].toLowerCase();
+      const raw = rot[2] || '';
+      const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+      const letter = axisToWide(axis); // r/u/f
+      emitFace(letter, suf, size);
+      continue;
+    }
+
+    // Slice moves (3x3 only semantics): single slice token like keybinds
+    const sm = t.match(/^([MES])((2')|2|'|)?$/i);
+    if (sm) {
+      const kind = sm[1].toUpperCase();
+      const raw = sm[2] || '';
+      const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+      const face = (kind === 'M') ? 'R' : (kind === 'E') ? 'U' : 'F';
+      if (suf === '2') {
+        // 180 is the same either way
+        emitFace(face, '', 2);
+        emitFace(face, '', 2);
+      } else if (kind === 'M') {
+        // Invert M/M' to match cube notation (App keybind semantics are UI-only):
+        // M  => 02R'
+        // M' => 02R
+        if (suf === "'") emitFace(face, '', 2);
+        else emitFace(face, "'", 2);
+      } else {
+        // E and S keep normal suffix behavior
+        if (suf === "'") emitFace(face, "'", 2);
+        else emitFace(face, '', 2);
       }
       continue;
     }
-    out.push(t);
+
+    // Regular face (upper/lower) with optional suffix
+    const mv = t.match(/^([RULDBFruldbf])((2')|2|'|)?$/);
+    if (mv) {
+      const face = mv[1];
+      const raw = mv[2] || '';
+      const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
+      const depth = face === face.toLowerCase() ? 2 : 1;
+      emitFace(face, suf, depth);
+      continue;
+    }
+
+    // Unknown token: skip
   }
-  return out.join('');
+
+  return out.join(' ');
 }
 
 // Removed unused bundle() helper
@@ -194,13 +341,11 @@ let generalizedBundle = (name, moveSet, moveSet2) => {
       algoName.push(i);
       algoName = algoName.join('');
     }
-    sets.push(
-      {
-        name: algoName,
-        moves: generalizerLower(i, moveSet, moveSet2),
-        worksFor: [i],
-      }
-    );
+    // For 3x3 OLL, create a size-aware sequence that includes whole-cube turns and slice moves as single moves.
+    const id = name.split('-')[1];
+    const displayStr3 = getOLLDisplayString(id);
+    const movesForSize = (i === 3) ? convertOLLForSize(displayStr3, 3) : generalizerLower(i, moveSet, moveSet2);
+    sets.push({ name: algoName, moves: movesForSize, worksFor: [i] });
     if (i < -1) {
       sets.push({
         name: algoName + " (Inverse)",
@@ -252,23 +397,30 @@ function move(depth, side) {
 // Build algorithms by iterating the OLL object (1..57), sanitizing and converting for engine use
 let algorithms = [blankBundle("None Selected")];
 
-for (let key in OLL) {
-  let value = OLL[key];
-  let newAlgorithm = convertRuwixAlgo(sanitizeOLLDisplay(value));
+for (let n = 1; n <= 57; n++) {
+  const key = String(n);
+  const value = getOLLDisplayString(key);
+  if (!value) continue;
+  // Pass the sanitized (non-size-aware) string for generalized sizes, but 3x3 will be rebuilt by convertOLLForSize
+  const newAlgorithm = convertRuwixAlgo(sanitizeOLLDisplay(value));
   algorithms.push(...generalizedBundle(`OLL-${key}`, newAlgorithm));
 }
-    // const displayStr = OLL[num];
-    // const engineStr = convertRuwixAlgo(sanitizeOLLDisplay(displayStr));
-    // algorithms.push(...generalizedBundle(`OLL-${num}`, engineStr));
+// const displayStr = OLL[num];
+// const engineStr = convertRuwixAlgo(sanitizeOLLDisplay(displayStr));
+// algorithms.push(...generalizedBundle(`OLL-${num}`, engineStr));
 
-console.log(algorithms[1]);
+// console.log(algorithms[1]);
 // console.log("algorithms");
 export default algorithms;
 
 // Named export: human-readable OLL display list (3x3) using the OLL object above
 // This is used by the UI to show the exact notation strings without numeric prefixes.
-export const ollDisplay = Object.entries(OLL).map(([num, str]) => ({
-  name: `OLL-${num}`,
-  display: String(str).trim(),
-  worksFor: [3],
-}));
+export const ollDisplay = Array.from({ length: 57 }, (_, i) => {
+  const num = String(i + 1);
+  const str = getOLLDisplayString(num);
+  return {
+    name: `OLL-${num}`,
+    display: String(str || '').trim(),
+    worksFor: [3],
+  };
+}).filter(item => item.display)

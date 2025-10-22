@@ -274,11 +274,27 @@ class App extends Component {
         this.rotateOneFace(key.toUpperCase(), [2, -1, 1]);
         break;
 
+      case '‰':
+        this.rotateOneFace("r'", [2, 0, 2, true]);
+        break;
+
+        case '®':
+        this.rotateOneFace("r", [2, -1, 2, true]);
+        break;
+
       case 'L':
         this.rotateOneFace(key + "'", [4, 0, 1]);
         break;
       case 'l':
         this.rotateOneFace(key.toUpperCase(), [4, -1, 1]);
+        break;
+
+      case 'Ò':
+        this.rotateOneFace("l'", [4, 0, 2, true]);
+        break;
+
+      case '¬':
+        this.rotateOneFace("l'", [4, -1, 2, true]);
         break;
 
       case 'F':
@@ -288,11 +304,31 @@ class App extends Component {
         this.rotateOneFace(key.toUpperCase(), [0, -1, 1]);
         break;
 
+        // For the advanced “f” (front wide move = rotate the first two layers together):
+      case 'Ï':
+        this.rotateOneFace("f'", [0, 0, 2, true]);
+        break;
+
+      case 'ƒ':
+        this.rotateOneFace("f", [0, -1, 2, true]);
+        break;
+        // Clockwise f: this.rotateOneFace('f', [0, -1, 2, true])
+        // Counterclockwise f': this.rotateOneFace("f'", [0, 0, 2, true])
+
       case 'U':
         this.rotateOneFace(key + "'", [1, 0, 1]);
         break;
+
       case 'u':
         this.rotateOneFace(key.toUpperCase(), [1, -1, 1]);
+        break;
+
+      case '¨':
+        this.rotateOneFace("¨'", [1, 0, 2, true]);
+        break;
+
+      case '*':
+        this.rotateOneFace("¨", [1, -1, 2, true]);
         break;
 
       case 'D':
@@ -302,11 +338,51 @@ class App extends Component {
         this.rotateOneFace(key.toUpperCase(), [5, -1, 1]);
         break;
 
+      case 'Î':
+        this.rotateOneFace("Î'", [5, 0, 2, true]);
+        break;
+
+      case '∂':
+        this.rotateOneFace("∂", [5, -1, 2, true]);
+        break;
+
       case 'B':
         this.rotateOneFace(key + "'", [3, 0, 1]);
         break;
       case 'b':
         this.rotateOneFace(key.toUpperCase(), [3, -1, 1]);
+        break;
+
+      case 'ı':
+        this.rotateOneFace("ı'", [3, 0, 2, true]);
+        break;
+
+      case '∫':
+        this.rotateOneFace("∫", [3, -1, 2, true]);
+        break;
+
+      case 'M':
+        this.rotateOneFace("r-slice", [2, -1, 2, false]);
+        break;
+
+      case 'm':
+        this.rotateOneFace("r-slice'", [2, 0, 2, false]);
+        break;
+
+       case 'E':
+        this.rotateOneFace("u-slice'", [1, -1, 2, false]);
+        break;
+
+       case 'e':
+        this.rotateOneFace("u-slice", [1, 0, 2, false]);
+        break;
+
+      case 'S':
+        this.rotateOneFace("f-slice'", [0, 0, 2, false]);
+        break;
+
+      case 's':
+        this.rotateOneFace("f-slice", [0, -1, 2, false]);
         break;
 
       // Advanced cube rotations (toggleable)
@@ -1666,7 +1742,7 @@ class App extends Component {
           /> : []
         }
 
-        <div data-role="sidebar" data-no-camera-reset="true">
+        {/* <div data-role="sidebar" data-no-camera-reset="true">
           <Menu
             state={this.state}
             setState={this.menuSetState}
@@ -1700,7 +1776,7 @@ class App extends Component {
             // Orientation
             onSetOrientation={this.handleSetOrientation}
           />
-        </div>
+        </div> */}
         {/* New lightweight overlay menu with OLL */}
         <NewMenu
           state={this.state}
