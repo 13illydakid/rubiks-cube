@@ -5,7 +5,7 @@
   z-index: 100001;
   /* just above OLL panel so button is always clickable */
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
 }
 

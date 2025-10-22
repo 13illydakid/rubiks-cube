@@ -102,6 +102,32 @@ export const OLLSetUP = {
   57: `r U R' U' M U R U' R'`
 }
 
+const PLL = {
+  "H": "(M2 U M2) U2 (M2 U M2)",
+  "Z": "R' U' R2 U (R U R' U') R U R U' R U' R' U2",
+  "Ua": "R2 U' (R' U' R) U R U (R U' R)",
+  "Ub": "(R' U R' U') R' U' (R' U R) U R2",
+
+  "Aa": "x z' R2 U2 (R' D' R) U2 (R' D R') z x'",
+  "Ab": "x R2 D2 (R U R') D2 (R U' R) x'",
+  "E": "R2 U R' U' y (R U R' U') (R U R' U') (R U R') y' (R U' R2')",
+
+  "T": "(R U R' U') R' F R2 U' R' U' R U R' F'",
+  "Y": "(F R U' R') U' (R U R' F') (R U R' U') (R' F R F')",
+  "F": "U' (R' U R U') R2 (F' U' F U) x (R U R' U') R2 x'",
+  "V": "(R' U R' U') y (R' D R' D') R2 y' (R' B' R B R)",
+  "Ja": "L' U' L F (L' U' L U) L F' L2 U L U",
+  "Jb": "R U R' F' (R U R' U') R' F R2 U' R' U'",
+  "Ra": "(L U2 L') U2 L F' (L' U' L U) L F L2 U",
+  "Rb": "(R' U2 R) U2 R' F (R U R' U') R' F' R2 U'",
+  "Na": "(R U R' U) (R U R' F') (R U R' U') R' F R2 U' R' U2 (R U' R')",
+  "Nb": "(R' U R U') R' (F' U' F) (R U R' F) R' F' (R U' R)",
+  "Ga": "y R2' u (R' U R' U') (R u' R2) y' (R' U R)",
+  "Gb": "(R' U' R) y R2 u (R' U R U') (R u' R2)",
+  "Gc": "y R2' u' R U' (R U R' u) R2 y (R U' R')",
+  "Gd": "y2 (R U R') y' (R2 u' R) U' (R' U R') u R2",
+}
+
 // Fallback helper: return display string for a given OLL id ("1".."57").
 // Prefer OLL[id]; if missing, derive by inverting the setup algorithm.
 function getOLLDisplayString(id) {
@@ -315,14 +341,9 @@ function convertOLLForSize(str, size) {
       emitFace(face, suf, depth);
       continue;
     }
-
-    // Unknown token: skip
   }
-
   return out.join(' ');
 }
-
-// Removed unused bundle() helper
 
 let blankBundle = (name) => {
   let cubeSizes = [];
@@ -405,12 +426,7 @@ for (let n = 1; n <= 57; n++) {
   const newAlgorithm = convertRuwixAlgo(sanitizeOLLDisplay(value));
   algorithms.push(...generalizedBundle(`OLL-${key}`, newAlgorithm));
 }
-// const displayStr = OLL[num];
-// const engineStr = convertRuwixAlgo(sanitizeOLLDisplay(displayStr));
-// algorithms.push(...generalizedBundle(`OLL-${num}`, engineStr));
 
-// console.log(algorithms[1]);
-// console.log("algorithms");
 export default algorithms;
 
 // Named export: human-readable OLL display list (3x3) using the OLL object above
@@ -424,3 +440,44 @@ export const ollDisplay = Array.from({ length: 57 }, (_, i) => {
     worksFor: [3],
   };
 }).filter(item => item.display)
+
+// PLL helpers and exports
+function getPLLDisplayString(id) {
+  const key = String(id);
+  return PLL[key] || '';
+}
+
+function generalizedBundleFromDisplay(name, displayStr, moveSet, moveSet2) {
+  const sets = [];
+  for (let i = 3; i <= sizeLimit; i++) {
+    let algoName = name;
+    if (name === "Cube x3") {
+      algoName = algoName.split('');
+      algoName.pop();
+      algoName.push(i);
+      algoName = algoName.join('');
+    }
+    const movesForSize = (i === 3)
+      ? convertOLLForSize(displayStr, 3)
+      : generalizerLower(i, moveSet, moveSet2);
+    sets.push({ name: algoName, moves: movesForSize, worksFor: [i] });
+  }
+  return sets;
+}
+
+export const pllDisplay = Object.entries(PLL).map(([key, str]) => ({
+  name: `PLL-${key}`,
+  display: String(str || '').trim(),
+  worksFor: [3],
+}));
+
+export const pllAlgorithms = [blankBundle("None Selected")];
+
+for (const [key, value] of Object.entries(PLL)) {
+  const displayStr = String(value || '');
+  if (!displayStr) continue;
+  const engineBase = convertRuwixAlgo(sanitizeOLLDisplay(displayStr));
+  pllAlgorithms.push(
+    ...generalizedBundleFromDisplay(`PLL-${key}`, displayStr, engineBase)
+  );
+}

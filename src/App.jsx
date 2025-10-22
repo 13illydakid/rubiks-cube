@@ -250,7 +250,12 @@ class App extends Component {
 
   // Execute whole-cube rotation around axis using existing rotateOneFace pipeline
   executeCubeRotation = (axis, isPrime) => {
-    if (this.state.currentFunc !== "None") return;
+    // Allow cube rotations during Algorithms/Solving by pausing autoplay, otherwise require None
+    if (this.state.currentFunc !== "None" && this.state.currentFunc !== "Algorithms" && this.state.currentFunc !== "Solving") return;
+    if (this.state.currentFunc === "Algorithms" || this.state.currentFunc === "Solving") {
+      // Pause any autoplay/single-step so manual input can take over
+      this.setState({ autoPlay: false, playOne: false, autoRewind: false });
+    }
     const cD = this.state.cubeDimension || this.getSizeFromUrl();
     let faceIndex = 0; // F,U,R,B,L,D => 0-5
     if (axis === 'x') faceIndex = 2;      // R axis
@@ -664,26 +669,33 @@ class App extends Component {
       });
   }
 
-  // Control when single buttons can be clicked
+  // Control when single buttons/keybinds can rotate faces
   rotateOneFace = (e, vals) => {
     if (vals.length < 4) vals.push(false);
 
-    if (this.state.currentFunc === "None") {
+    // Permit manual turns during Algorithms/Solving by pausing autoplay; otherwise require None
+    const canManualTurn = this.state.currentFunc === "None" || this.state.currentFunc === "Algorithms" || this.state.currentFunc === "Solving";
+    if (!canManualTurn) return;
 
-      let cD = this.state.cubeDimension;
-      let rubiksObject = this.state.rubiksObject;
-      let blockMoveLog = this.state.blockMoveLog;
-      let moveLog = this.state.moveLog;
-      let solveMoves = this.state.solveMoves;
-      let solveState = this.state.solveState;
-      let end = this.state.end;
-      let obj = cube.rotateCubeFace(vals[0], vals[1], vals[2], vals[3], blockMoveLog, moveLog, solveMoves, end, solveState);
-
-      obj.currentFunc = e;
-      obj.rubiksObject = cube.rotateFace(obj.face, obj.turnDirection, obj.cubeDepth, obj.isMulti, cD, rubiksObject);
-
-      this.setState(obj);
+    let pre = {};
+    if (this.state.currentFunc === "Algorithms" || this.state.currentFunc === "Solving") {
+      pre = { autoPlay: false, playOne: false, autoRewind: false };
     }
+
+    let cD = this.state.cubeDimension;
+    let rubiksObject = this.state.rubiksObject;
+    let blockMoveLog = this.state.blockMoveLog;
+    let moveLog = this.state.moveLog;
+    let solveMoves = this.state.solveMoves;
+    let solveState = this.state.solveState;
+    let end = this.state.end;
+    let obj = cube.rotateCubeFace(vals[0], vals[1], vals[2], vals[3], blockMoveLog, moveLog, solveMoves, end, solveState);
+
+    obj = { ...pre, ...obj };
+    obj.currentFunc = e;
+    obj.rubiksObject = cube.rotateFace(obj.face, obj.turnDirection, obj.cubeDepth, obj.isMulti, cD, rubiksObject);
+
+    this.setState(obj);
   }
 
   // Small bug, account for double turns
