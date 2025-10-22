@@ -127,9 +127,10 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
       top: "50%",
       right: "32px",
       transform: "translateY(-50%)",
-      background: "#fff",
+      background: "rgba(255, 255, 255, 0.0",
       borderRadius: "12px",
       boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+      color: "rgba(255, 255, 255, 0.70)",
       padding: "2rem 1.5rem",
       zIndex: 9999,
       pointerEvents: "auto",
@@ -140,7 +141,7 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
         Top: {topColor} • Front: {frontColor}
       </div>
       <div style={{ marginBottom: "1.5rem" }}>
-        <label style={{ fontWeight: "bold" }}>Top Face:</label>
+        <label style={{ fontWeight: "bold" }}>Top Face: {currentTop.toUpperCase()}</label>
         <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
           {COLORS.map(color => (
             <button
@@ -160,7 +161,7 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
         </div>
       </div>
       <div style={{ marginBottom: "1.5rem" }}>
-        <label style={{ fontWeight: "bold" }}>Front Face:</label>
+        <label style={{ fontWeight: "bold" }}>Front Face: {currentFront.toUpperCase()}</label>
         <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
           {COLORS.map(color => {
             const isAllowed = allowedFronts.includes(color);

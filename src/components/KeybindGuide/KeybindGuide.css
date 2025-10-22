@@ -1,0 +1,115 @@
+.keybind-guide {
+  position: fixed;
+  bottom: 8px;
+  /* move to bottom-right */
+  right: 8px;
+  width: 520px;
+  /* wider to reduce height by splitting into columns */
+  max-height: calc(100vh - 16px);
+  overflow: auto;
+  padding: 6px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0);
+  /* fully transparent background as requested */
+  color: #eaeaea;
+  z-index: 6;
+  font-size: 11.5px;
+  /* compact text */
+  line-height: 1.2;
+  pointer-events: none;
+  /* avoid interfering with other UI (e.g., OrientationPicker) */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.kb-header {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.kb-section {
+  margin-bottom: 6px;
+  padding-right: 6px;
+}
+
+.kb-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #e0e0e0;
+  font-size: 11px;
+}
+
+/* Two-column split of categories */
+.kb-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12px;
+}
+
+.kb-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Multi-column layout: show 3 pairs per row when space allows (keys left, notation right) */
+.kb-table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr max-content);
+  column-gap: 8px;
+  row-gap: 2px;
+  align-items: center;
+}
+
+.kb-row {
+  display: contents;
+}
+
+.kb-notation {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  /* remove backgrounds to save space visually */
+  color: #fff;
+  text-align: right;
+}
+
+.kb-keys {
+  opacity: 0.9;
+}
+
+.kb-footnote {
+  margin-top: 4px;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+@media (max-width: 1024px) {
+  .keybind-guide {
+    width: 380px;
+    right: 6px;
+  }
+
+  .kb-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .kb-table {
+    grid-template-columns: repeat(2, 1fr max-content);
+  }
+}
+
+@media (max-width: 640px) {
+  .keybind-guide {
+    width: 260px;
+    right: 6px;
+  }
+
+  .kb-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .kb-table {
+    grid-template-columns: repeat(2, 1fr max-content);
+  }
+}

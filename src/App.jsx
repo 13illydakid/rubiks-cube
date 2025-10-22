@@ -16,6 +16,7 @@ import cube from './cubeFunctions/cube';
 import moveFuncs from './cubeFunctions/move';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import ColorPickerUIFunctions from "./components/ColorPicker/ColorPickerUIFunctions";
+import KeybindGuide from "./components/KeybindGuide/KeybindGuide.jsx";
 
 // TODO:
 /*
@@ -1808,6 +1809,9 @@ class App extends Component {
             currentFront={this.state.frontFaceColor}
           />
         </div>
+
+        {/* Always-open Keybind Guide (transparent background) */}
+        <KeybindGuide />
 
         <div style={{ width: "100%", position: "absolute", bottom: "85px", margin: "auto", display: "flex" }}>
           <div style={{ margin: "auto", display: "inline-flex", }}>
