@@ -101,9 +101,10 @@ class App extends Component {
     blackObject: [],
     topFaceColor: "yellow", // Default top
     frontFaceColor: "red",  // Default front
-    speed: 7.5,          // Control individual piece rotation speed (don't change)
-    rotationSpeed: 350,  // Controls visual rotation speed
-    start: 7.5,          // Start value for a rotation or set of rotations
+  // Increased initial autoplay speed by 1.5x (was 7.5/350). Higher speed, lower rotation duration.
+  speed: 11.25,        // Control individual piece rotation speed
+  rotationSpeed: 233,  // Controls visual rotation speed (≈350/1.5)
+  start: 11.25,        // Start value for a rotation or set of rotations
     end: 0,              // End value for a roation or set of rotations
     turnDirection: 0,    // Dictates whether the rotation is clockwise or counterclockwise
     face: 0,             // The face being turned
@@ -117,7 +118,7 @@ class App extends Component {
     angle: 3.9,          // Camera angle
     cubeDimension: null, // Cube dimensions. Ex: 3 => 3x3x3 cube
     cubeDepth: 1,        // Used to determine rotation depth on cubes greater than 3
-    currentSpeed: "Medium",// Displays which speed is selected
+  currentSpeed: "Medium x1.5",// Displays which speed is selected
     moves: 0,            // Used by scramble functions
     reload: false,       // Lets animate know when to reload the cube (after every move)
     solveState: -1,      // Dictates progression of solve function
@@ -181,6 +182,8 @@ class App extends Component {
     ,
     // Feature flag to enable advanced cube rotation notations (x,y,z)
     advancedNotationEnabled: true,
+    // UI: whether to highlight current algorithm step in OLL/PLL panels
+    highlightEnabled: false,
   };
 
   // Toggle advanced notation feature on/off
@@ -1305,7 +1308,7 @@ class App extends Component {
     window.addEventListener("resize", () => onWindowResize(this.windowResized), false);
   window.addEventListener('dblclick', this.handleGlobalDblClick, false);
 
-    // Set background color and size
+  // Set background color and size
     renderer.setClearColor(new THREE.Color("black"), 0.3);
     renderer.domElement.className = "canvas";
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1443,16 +1446,21 @@ class App extends Component {
       animate();
     });
 
+    // Track rotation state for highlight timing
+    this._rotating = false;
+
     // Function runs continuously to animate cube
     let animate = () => {
 
       requestAnimationFrame(animate);
 
+      const rotatingNow = this.state.start <= this.state.end;
+
       for (let i = 0; i < groups.length; i++) {
         groups[i].forEach(group => group.visible = false)
       }
       // Animate queued rotation
-      if (this.state.start <= this.state.end) {
+      if (rotatingNow) {
         this.setState(cube.rotatePieces(cube.rotatePoint, tempCubes, this.state));
       }
 
@@ -1628,7 +1636,7 @@ class App extends Component {
                 // store the object here
                 if (moveData) {
                   obj.rubiksObject = cube.rotateFace(obj.face, obj.turnDirection, obj.cubeDepth, obj.isMulti, cD, tempRubiks);
-                  obj.solvedSetIndex = this.state.solvedSetIndex + 1;
+                  // Do not increment solvedSetIndex here; we advance highlight on rotation completion in animate()
                 }
 
                 //console.log(obj);
@@ -1705,6 +1713,14 @@ class App extends Component {
           }
         }
       }
+
+      // Detect rotation completion to advance highlight exactly once per finished turn
+      if (this._rotating && !rotatingNow) {
+        if (this.state.highlightEnabled && this.state.currentFunc === "Algorithms") {
+          this.setState({ solvedSetIndex: this.state.solvedSetIndex + 1 });
+        }
+      }
+      this._rotating = rotatingNow;
 
       controls.update();
       renderer.render(scene, camera);

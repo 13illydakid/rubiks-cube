@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { pllAlgorithms, pllDisplay } from "../../cubeFunctions/algorithms";
 import cube from "../../cubeFunctions/cube";
 import "./PLL.css";
+import { buildEngineToDisplayIndex } from "../../utils/algorithmDisplayMapping";
 
 // Preload PLL case images (e.g., H.png, Ua.png ...)
 const pllImageModules = import.meta.glob("../../assets/pll/*.png", { eager: true, import: 'default' });
@@ -155,6 +156,7 @@ const PLLPanel = (props) => {
       autoRewind: false,
       autoTarget: false,
       jumpToEnd: false,
+      highlightEnabled: false, // disable highlighting during setup autoplay
     });
     if (typeof reload === 'function') reload('all');
   };
@@ -212,7 +214,8 @@ const PLLPanel = (props) => {
               setState({ autoPlay: false, playOne: false });
             } else {
               if (state.moveSet && state.moveSet.length) {
-                setState({ autoPlay: true, playOne: true });
+                // Continue setup or existing queue, keep highlighting off until solve starts
+                setState({ autoPlay: true, playOne: true, highlightEnabled: false });
               } else {
                 const nextSolveSet = selected ? [...selected.solveMovesArr] : [];
                 setState({
@@ -226,6 +229,7 @@ const PLLPanel = (props) => {
                   autoRewind: false,
                   autoTarget: false,
                   jumpToEnd: false,
+                  highlightEnabled: true, // enable highlighting during solve playback
                 });
               }
             }
@@ -243,43 +247,12 @@ const PLLPanel = (props) => {
         <button className="pll-btn" onClick={() => applySpeed(3, 750, 'Slower')}>Slower</button>
         <button className="pll-btn" onClick={() => applySpeed(5, 500, 'Slow')}>Slow</button>
         <button className="pll-btn" onClick={() => applySpeed(7.5, 350, 'Medium')}>Medium</button>
+        <button className="pll-btn" onClick={() => applySpeed(10, 50, 'Fast')}>Fast</button>
       </div>
 
-      {selected && (() => {
-        const raw = String(selected.displayStr || '').replace(/\(/g, ' ( ').replace(/\)/g, ' ) ').trim();
-        const tokens = raw.length ? raw.split(/\s+/) : [];
-        const displayTokens = [];
-        const engineIdxToDisplayIdx = [];
-        const pushMap = (count) => { for (let i = 0; i < count; i++) engineIdxToDisplayIdx.push(displayTokens.length); };
-
-        const isParen = (t) => t === '(' || t === ')';
-        const rotMatch = (t) => t.match(/^([xyz])((2')|2|'|)?$/i);
-        const sliceMatch = (t) => t.match(/^([MES])((2')|2|'|)?$/i);
-        const moveMatch = (t) => t.match(/^([RULDBFruldbf])((2')|2|'|)?$/);
-
-        tokens.forEach((t) => {
-          if (!t) return;
-          const rot = rotMatch(t);
-          const sl = sliceMatch(t);
-          const mv = moveMatch(t);
-          if (isParen(t)) return;
-          displayTokens.push(t);
-          if (rot) {
-            const raw = rot[2] || '';
-            const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
-            if (suf === '2') pushMap(2); else pushMap(1);
-          } else if (sl) {
-            const raw = sl[2] || '';
-            const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
-            if (suf === '2') pushMap(2); else pushMap(1);
-          } else if (mv) {
-            const raw = mv[2] || '';
-            const suf = raw && raw.startsWith('2') ? '2' : raw === "'" ? "'" : '';
-            if (suf === '2') pushMap(2); else pushMap(1);
-          }
-        });
-
-        const dispIdx = engineIdxToDisplayIdx[state.solvedSetIndex] ?? -1;
+  {selected && (() => {
+        const { displayTokens, engineIdxToDisplayIdx } = buildEngineToDisplayIndex(selected.displayStr);
+        const dispIdx = state.highlightEnabled ? (engineIdxToDisplayIdx[state.solvedSetIndex] ?? -1) : -1;
         return (
           <div className="pll-detail" data-no-camera-reset>
             <div className="pll-notation-view">
