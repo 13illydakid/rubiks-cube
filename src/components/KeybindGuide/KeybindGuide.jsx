@@ -8,16 +8,43 @@ const Row = ({ notation, keys }) => (
   </div>
 );
 
-const Section = ({ title, items }) => (
-  <div className="kb-section">
-    <div className="kb-title">{title}</div>
-    <div className="kb-table">
-      {items.map((it) => (
-        <Row key={it.notation + it.keys} notation={it.notation} keys={it.keys} />
-      ))}
+// Group items so each base move (e.g., R) stacks with its prime (R') vertically in the same column
+const Section = ({ title, items, className }) => {
+  // Build stable base-> { main, prime } groups keeping original order of first appearance
+  const map = new Map();
+  const order = [];
+  items.forEach((it) => {
+    const base = it.notation.replace(/'/g, "");
+    if (!map.has(base)) {
+      map.set(base, { base, main: null, prime: null });
+      order.push(base);
+    }
+    const bucket = map.get(base);
+    if (it.notation.includes("'")) bucket.prime = it; else bucket.main = it;
+  });
+
+  return (
+    <div className={`kb-section ${className || ''}`}>
+      <div className="kb-title">{title}</div>
+      {/* Matrix of columns; each column contains up to two rows: non-prime then prime */}
+      <div className="kb-matrix">
+        {order.map((base) => {
+          const g = map.get(base);
+          return (
+            <div className="kb-colpair" key={base}>
+              {g.main && (
+                <Row key={g.main.notation + g.main.keys} notation={g.main.notation} keys={g.main.keys} />
+              )}
+              {g.prime && (
+                <Row key={g.prime.notation + g.prime.keys} notation={g.prime.notation} keys={g.prime.keys} />
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const KeybindGuide = () => {
   const faces = [
@@ -80,7 +107,7 @@ const KeybindGuide = () => {
           <Section title="Rotations" items={rotations} />
         </div>
         <div className="kb-col">
-          <Section title="Wide (two-layer)" items={wide} />
+          <Section title="Wide (two-layer)" items={wide} className="wide" />
           <div className="kb-section">
             <div className="kb-title">Prime info</div>
             <div className="kb-info">

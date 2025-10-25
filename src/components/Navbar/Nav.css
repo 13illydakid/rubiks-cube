@@ -1,133 +1,182 @@
-.dropdown{
-    float: right!important;
+.dropdown {
+  float: right !important;
 }
 
-.navbar{
-    /* background-color:rgba(0,0,255,.3); */
-    padding: 1rem 1rem!important;
+.navbar {
+  /* background-color:rgba(0,0,255,.3); */
+  padding: 1rem 1rem !important;
 }
 
 
-.cubes{
-    margin-right: 5px;
+.cubes {
+  margin-right: 5px;
 }
 
-.cubesDropdown,.settingsDropDown{
-    display: inline-block;
+.cubesDropdown,
+.settingsDropDown {
+  display: inline-block;
 }
 
-.settingsDropDown{
-    float: right;
-    margin-right: 4px;
+.settingsDropDown {
+  float: right;
+  margin-right: 4px;
 }
 
-.cubesDropdown > .cubes > .dropdown-menu{
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-bottom: 0px;
+.cubesDropdown>.cubes>.dropdown-menu {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-bottom: 0px;
 }
 
-.cubesDropdown > .cubes > .dropdown-menu,.settingsDropDown > .settings > .dropdown-menu{
-    height: 100%;
-    min-height: 30vh;
-    color: #343a40!important;
-    border: 2px solid rgb(52, 58, 64);
-    overflow-y: scroll;
-    border: 2px solid rgb(52, 58, 64);
-    border-radius: .25rem;
-    background-color: transparent;
+.cubesDropdown>.cubes>.dropdown-menu,
+.settingsDropDown>.settings>.dropdown-menu {
+  height: 100%;
+  min-height: 30vh;
+  color: #343a40 !important;
+  border: 2px solid rgb(52, 58, 64);
+  overflow-y: scroll;
+  border: 2px solid rgb(52, 58, 64);
+  border-radius: .25rem;
+  background-color: transparent;
 }
 
-.cubesDropdown > .cubes > .dropdown-menu > .dropdown-item{
-    width: 100%;
-    color: #007bff;
-    border: none;
-    /* border-bottom: 1px solid grey; */
-    transition: all .4s;
-    background: rgba(0, 0, 0, .9);
-    border-radius: .25rem;
-    margin-bottom: 8px;
+.cubesDropdown>.cubes>.dropdown-menu>.dropdown-item {
+  width: 100%;
+  color: #007bff;
+  border: none;
+  /* border-bottom: 1px solid grey; */
+  transition: all .4s;
+  background: rgba(0, 0, 0, .9);
+  border-radius: .25rem;
+  margin-bottom: 8px;
 }
 
-.checkbox-inline{
-    display: inline-block;
-    margin-right: 4px;
+.checkbox-inline {
+  display: inline-block;
+  margin-right: 4px;
 }
 
-.cubesDropdown > .cubes > .dropdown-menu > .dropdown-item:active{
-    opacity: 80%;
+.cubesDropdown>.cubes>.dropdown-menu>.dropdown-item:active {
+  opacity: 80%;
 }
 
-.cubesDropdown > .cubes > .dropdown-menu > .dropdown-item:hover{
-    background-color: rgba(100, 100, 100,.5);
+.cubesDropdown>.cubes>.dropdown-menu>.dropdown-item:hover {
+  background-color: rgba(100, 100, 100, .5);
 }
 
-.settingsDropDown > .settings > .dropdown-menu > ul{
-    padding-left: 8px;
+.settingsDropDown>.settings>.dropdown-menu>ul {
+  padding-left: 8px;
 }
 
-.settingsDropDownItem{
-    width: 100%;
-    color: #007bff;
-    transition: all .4s;
-    background: rgba(0, 0, 0, .9);
-    border-radius: .25rem;
-    list-style-type: none;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    margin-bottom: 8px;
-    pointer-events: visible;
+.settingsDropDownItem {
+  width: 100%;
+  color: #007bff;
+  transition: all .4s;
+  background: rgba(0, 0, 0, .9);
+  border-radius: .25rem;
+  list-style-type: none;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  pointer-events: visible;
 }
 
-.navbar-brand{
-    position: relative;
-    float: left;
+.navbar-brand {
+  position: relative;
+  float: left;
 }
 
-.navbar-brand,.settings,.cubes{
-    margin-bottom: 0px;
-    height: 100%;
+.navbar-brand,
+.settings,
+.cubes {
+  margin-bottom: 0px;
+  height: 100%;
 }
 
-.settingsDropDown,.navbar-brand,.cubesDropdown{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.settingsDropDown,
+.navbar-brand,
+.cubesDropdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#infoBtn,#fullscreenBtn,.settings > button,.cubes > button{
-    height: 40px;
-    border: 2px solid blue;
-    border-radius: .25rem;
-    transition: background-color .4s ease;
-    background-color:transparent;
-    color: lightgray;
+#infoBtn,
+#fullscreenBtn,
+.settings>button,
+.cubes>button {
+  height: 40px;
+  border: 2px solid blue;
+  border-radius: .25rem;
+  transition: background-color .4s ease;
+  background-color: transparent;
+  color: lightgray;
 }
 
-#infoBtn:hover,#fullscreenBtn:hover,.settings > button:hover,.cubes > button:hover{
-    background-color: blue;
-    border: 2px solid blue;
+#infoBtn:hover,
+#fullscreenBtn:hover,
+.settings>button:hover,
+.cubes>button:hover {
+  color: #28a745;
+  border: 2px solid rgba(40, 167, 69, 0);
 }
 
-#closeBtn{
-  -moz-border-radius:50%;
-  -webkit-border-radius:50%;
-  border-radius:50%;
-    width: 2rem;
-    height: 2rem;
-    border: 2px solid #007bff;
-    pointer-events: auto;
+#closeBtn {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border-radius: 20%;
+  width: 25px;
+  height: 25px;
+  font-size: 1.2rem;
+  border: 1.5px solid #007bff;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
-#closeBtn:hover{
-    border-color: #007bff!important;
-    background-color: rgba(100, 100, 100,.5);
+#closeBtn:hover {
+  cursor: pointer;
+  border: 2px solid rgba(40, 167, 69, 0);
+  color: rgba(40, 167, 69);
+  background: rgba(0, 0, 0, 0);
+  transform: scale(1.5);
 }
 
-.cubesDropdown,.settingsDropDown{
+.cubesDropdown,
+.settingsDropDown {
   display: none;
+}
+
+/* .popupDiv {
+  z-index: 102;
+  position: relative;
+  top: -20px;
+  width: max-content;
+  height: auto;
+  margin: auto;
+} */
+
+.popupDiv {
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 32vh;
+  height: auto;
+  margin-top: 0;
+  color: lightgrey;
+  font-size: 0.95rem;
+  text-align: center;
+  border-radius: 5%;
+  padding: 8px;
+  position: relative;
+  right: 16vh;
 }
 
 .cube-notations-container {
@@ -147,10 +196,13 @@
 }
 
 @keyframes breathe {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.15);
     opacity: 0.85;

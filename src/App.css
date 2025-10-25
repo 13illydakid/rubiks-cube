@@ -159,6 +159,7 @@ button:focus {outline:0;}
   background-size: cover;
   background-position: center;
   background: radial-gradient(#343a40, #000000);
+  pointer-events: auto;
 }
 
 /* Prevent selecting text in move input */

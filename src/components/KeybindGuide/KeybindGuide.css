@@ -2,11 +2,11 @@
   position: fixed;
   bottom: 8px;
   /* move to bottom-right */
-  right: 8px;
-  width: 520px;
+  right: 1vw;
+  width: auto;
   /* wider to reduce height by splitting into columns */
   max-height: calc(100vh - 16px);
-  overflow: auto;
+  overflow: visible;
   padding: 6px 6px;
   border-radius: 6px;
   background: rgba(0, 0, 0, 0);
@@ -20,6 +20,8 @@
   /* avoid interfering with other UI (e.g., OrientationPicker) */
   -webkit-user-select: none;
   user-select: none;
+  /* fixed width for notation column to align vertically */
+  --kb-notation-w: 36px;
 }
 
 .kb-header {
@@ -30,15 +32,20 @@
 }
 
 .kb-section {
-  margin-bottom: 6px;
-  padding-right: 6px;
+  margin-bottom: 8px;
+  padding: 6px 6px 4px 6px;
+  /* inner padding for chart look */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
 }
 
 .kb-title {
   font-weight: 600;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   color: #e0e0e0;
   font-size: 11px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* Two-column split of categories */
@@ -54,12 +61,18 @@
   gap: 6px;
 }
 
-/* Multi-column layout: show 3 pairs per row when space allows (keys left, notation right) */
-.kb-table {
+/* Matrix layout: columns are base moves; rows stack non-prime and prime in the same column */
+.kb-matrix {
   display: grid;
-  grid-template-columns: repeat(3, 1fr max-content);
-  column-gap: 8px;
-  row-gap: 2px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 4px;
+}
+
+/* Each logical column renders its own 2-column grid: [keys][notation-fixed] */
+.kb-colpair {
+  display: grid;
+  grid-template-columns: 1fr var(--kb-notation-w);
   align-items: center;
 }
 
@@ -72,10 +85,25 @@
   /* remove backgrounds to save space visually */
   color: #fff;
   text-align: right;
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+  /* vertical split inside pair */
+  padding-left: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+  /* keep notation in a single line */
+  border-right: 1px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  justify-self: auto;
 }
 
 .kb-keys {
   opacity: 0.9;
+  white-space: nowrap;
+  /* keep keybind in a single line */
+  font-size: 10.25px;
+  /* slightly smaller so long combos fit */
+  padding-right: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .kb-footnote {
@@ -84,18 +112,38 @@
   opacity: 0.7;
 }
 
+/* Wider layout for the Wide (two-layer) section to avoid overlapping long key strings */
+.kb-section.wide {
+  --kb-notation-w: 40px;
+  /* a bit wider for clarity */
+}
+
+.kb-section.wide .kb-matrix {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 10px;
+}
+
 @media (max-width: 1024px) {
   .keybind-guide {
     width: 380px;
     right: 6px;
+    --kb-notation-w: 34px;
   }
 
   .kb-columns {
     grid-template-columns: 1fr 1fr;
   }
 
-  .kb-table {
-    grid-template-columns: repeat(2, 1fr max-content);
+  .kb-matrix {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kb-section.wide .kb-matrix {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kb-keys {
+    font-size: 9.75px;
   }
 }
 
@@ -103,13 +151,23 @@
   .keybind-guide {
     width: 260px;
     right: 6px;
+    --kb-notation-w: 32px;
   }
 
   .kb-columns {
     grid-template-columns: 1fr;
   }
 
-  .kb-table {
-    grid-template-columns: repeat(2, 1fr max-content);
+  .kb-matrix {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* On very small screens, give wide section full width per column */
+  .kb-section.wide .kb-matrix {
+    grid-template-columns: 1fr;
+  }
+
+  .kb-keys {
+    font-size: 9.25px;
   }
 }
