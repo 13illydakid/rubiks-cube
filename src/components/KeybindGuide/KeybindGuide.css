@@ -1,27 +1,22 @@
 .keybind-guide {
   position: fixed;
-  bottom: 8px;
-  /* move to bottom-right */
-  right: 1vw;
+  bottom: 1vw;
+  right: 2vw;
   width: auto;
-  /* wider to reduce height by splitting into columns */
   max-height: calc(100vh - 16px);
   overflow: visible;
   padding: 6px 6px;
   border-radius: 6px;
   background: rgba(0, 0, 0, 0);
-  /* fully transparent background as requested */
   color: #eaeaea;
   z-index: 6;
   font-size: 11.5px;
-  /* compact text */
   line-height: 1.2;
   pointer-events: none;
-  /* avoid interfering with other UI (e.g., OrientationPicker) */
   -webkit-user-select: none;
   user-select: none;
-  /* fixed width for notation column to align vertically */
   --kb-notation-w: 36px;
+  transform: scale(1.1);
 }
 
 .kb-header {

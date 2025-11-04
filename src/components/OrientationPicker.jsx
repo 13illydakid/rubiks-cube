@@ -23,6 +23,19 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
     return Object.keys(obj);
   }, [topColor]);
 
+  // Map selected front color to its valid top colors by scanning Orientation tables
+  const allowedTops = useMemo(() => {
+    const map = {
+      yellow: Orientation.YellowTop,
+      red: Orientation.RedTop,
+      blue: Orientation.BlueTop,
+      orange: Orientation.OrangeTop,
+      green: Orientation.GreenTop,
+      white: Orientation.WhiteTop,
+    };
+    return Object.keys(map).filter(tc => !!(map[tc] && map[tc][frontColor]));
+  }, [frontColor]);
+
   // When top changes, ensure front is valid; prioritize red if available
   useEffect(() => {
     if (!allowedFronts.includes(frontColor)) {
@@ -30,6 +43,14 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
       if (fallback) setFrontColor(fallback);
     }
   }, [allowedFronts, frontColor]);
+
+  // When front changes, ensure top is valid; prioritize yellow if available
+  useEffect(() => {
+    if (!allowedTops.includes(topColor)) {
+      const fallback = allowedTops.includes("yellow") ? "yellow" : allowedTops[0];
+      if (fallback) setTopColor(fallback);
+    }
+  }, [allowedTops, topColor]);
 
   const handleApply = () => {
     // Debug: log selected values
@@ -124,8 +145,8 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
   return (
     <div style={{
       position: "fixed",
-      top: "50%",
-      right: "32px",
+      top: "52vh",
+      right: "5vw",
       transform: "translateY(-50%)",
       background: "rgba(255, 255, 255, 0.0",
       borderRadius: "12px",
@@ -137,45 +158,54 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
       minWidth: "220px"
     }}>
       <h3 style={{ marginBottom: "1rem", fontSize: "1.1rem" }}>Cube Orientation</h3>
-      <div style={{ fontSize: ".9rem", color: "#555", marginBottom: ".5rem" }}>
-        Top: {topColor} • Front: {frontColor}
+      <div className="curr-colors-text">
+        (Current) Top: &nbsp; <p style={{ color: `${currentTop}` }}>{currentTop}</p> • Front: &nbsp; <p style={{ color: `${currentFront}` }}>{currentFront}</p>
       </div>
       <div style={{ marginBottom: "1.5rem" }}>
-        <label style={{ fontWeight: "bold" }}>Top Face: {currentTop.toUpperCase()}</label>
+        <label style={{ display: "inline-flex", fontWeight: "bold" }}>Set Top Color: &nbsp; <p style={{ color:`${topColor}` }}>{topColor}</p></label>
         <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-          {COLORS.map(color => (
-            <button
-              key={color}
-              style={{
-                background: color,
-                border: topColor === color ? "2px solid #333" : "1px solid #ccc",
-                borderRadius: "50%",
-                width: "32px",
-                height: "32px",
-                cursor: "pointer"
-              }}
-              onClick={() => setTopColor(color)}
-              aria-label={`Set top face to ${color}`}
-            />
-          ))}
+          {COLORS.map(color => {
+            const isTopAllowed = allowedTops.includes(color);
+            return (
+              <button
+                key={color}
+                className="top-color-circle"
+                style={{
+                  background: color,
+                  border: topColor === color ? "2px solid #fff" : "1px solid #333",
+                  borderRadius: "50%",
+                  width: "32px",
+                  height: "32px",
+                  position: "relative",
+                  cursor: isTopAllowed ? "pointer" : "not-allowed",
+                  opacity: topColor === color ? "1" : isTopAllowed ? "0.8" : "0.3",
+                }}
+                onClick={() => isTopAllowed && setTopColor(color)}
+                aria-label={`Set top face to ${color}`}
+                disabled={!isTopAllowed}
+              />
+            );
+          })}
         </div>
       </div>
       <div style={{ marginBottom: "1.5rem" }}>
-        <label style={{ fontWeight: "bold" }}>Front Face: {currentFront.toUpperCase()}</label>
+        <label style={{ display: "inline-flex", fontWeight: "bold" }}>Set Front Color: &nbsp; <p style={{ color: `${frontColor}` }}>{frontColor}</p></label>
         <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
           {COLORS.map(color => {
             const isAllowed = allowedFronts.includes(color);
             return (
               <button
                 key={color}
+                className="front-color-circle"
                 style={{
                   background: color,
-                  border: frontColor === color ? "2px solid #333" : "1px solid #ccc",
+                  border: frontColor === color ? "2px solid #fff" : "1px solid #333",
                   borderRadius: "50%",
                   width: "32px",
                   height: "32px",
+                  position: "relative",
                   cursor: isAllowed ? "pointer" : "not-allowed",
-                  opacity: isAllowed ? 1 : 0.3,
+                  opacity: frontColor === color ? "1" : isAllowed ? "0.8" : "0.3",
                 }}
                 onClick={() => isAllowed && setFrontColor(color)}
                 aria-label={`Set front face to ${color}`}

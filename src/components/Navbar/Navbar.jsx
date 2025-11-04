@@ -1,13 +1,33 @@
 import React from "react";
 import "./Nav.css";
-// Cleaned up unused react-bootstrap dropdown imports
 import Popup from "reactjs-popup";
-import notations from "../../assets/notations.png";
 import { Link } from "react-router-dom";
 import logo from "../../assets/favicon.png";
 
-const Navbar = props => {
-  // Legacy dropdowns removed during cleanup
+const notationImageModules = import.meta.glob("../../assets/notations/*.png", { eager: true, import: 'default' });
+const notationImageByNumber = (() => {
+  const map = new Map();
+  for (const path in notationImageModules) {
+    const filename = path.split('/').pop();
+    const base = filename?.split('.')?.[0] || '';
+    const num = parseInt(base, 10);
+    if (!Number.isNaN(num)) {
+      map.set(String(num), notationImageModules[path]);
+    }
+  }
+  return map;
+});
+
+// Build the map once at module load using the provided function expression
+const notationImageMap = notationImageByNumber();
+
+const Navbar = (props) => {
+  const rows = [
+    [1, 2, 3, 4, 5, 6],
+    [7, 8, 9],
+    [13, 14, 15, 10, 11, 12]
+  ];
+
   return (
     <nav className="navbar navbar-dark fixed-top">
       <div className="logo" >
@@ -15,23 +35,24 @@ const Navbar = props => {
           <img src={logo} alt="Logo" />
         </Link>
       </div>
-      <div style={{ float: "right", height: "100%" }} >
-        <Popup trigger={<button id="infoBtn">Notations</button>}>
-          {close => (
-            <div style={{ width: "100%", height: "100%" }}>
-              <div className="shadeBackground" style={{ backgroundColor: "black" }} onClick={close}></div>
-              <div className="popupDiv">
-                <div className="closeBtn" id="closeBtn" onClick={close}>
-                  &times;
-                </div>
-                  <div>Click and drag anywhere <br/> not on the cube to rotate.</div>
-                  <div className="cube-notations-container">
-                    <img src={notations} alt="Cube Notations" className="notations-image" />
-                  </div>
-              </div>
-            </div>
-          )}
-        </Popup>
+      <div className="notations-container" aria-label="Cube notation legend">
+        {rows.map((nums, idx) => (
+          <div className={`notations-row row-${idx + 1}`} key={`row-${idx + 1}`}>
+            {nums.map((n) => {
+              const src = notationImageMap.get(String(n));
+              if (!src) return null;
+              return (
+                <img
+                  key={`notation-${n}`}
+                  className="notation-img"
+                  src={src}
+                  alt={`Notation ${n}`}
+                  loading="lazy"
+                />
+              );
+            })}
+          </div>
+        ))}
       </div>
     </nav>)
 };
