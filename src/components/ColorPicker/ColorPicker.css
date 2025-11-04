@@ -218,6 +218,23 @@
   padding-right: 1%;
 }
 
+.orientation-picker-container {
+  position: fixed;
+  top: 30vh;
+  right: 1vw;
+  background: rgba(255, 255, 255, 0.0);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  color: rgba(255, 255, 255, 0.70);
+  /* padding: 2rem 1.5rem; */
+  padding-top: 2vw;
+  padding-bottom: 10px;
+  z-index: 9999;
+  pointer-events: auto;
+  max-width: 15vw;
+  transform: scale(0.85);
+}
+
 .curr-colors-text {
   display: inline-flex;
   font-size: .9rem;

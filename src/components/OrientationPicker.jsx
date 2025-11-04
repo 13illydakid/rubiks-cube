@@ -143,20 +143,7 @@ export default function OrientationPicker({ onSetOrientation, currentTop, curren
   };
 
   return (
-    <div style={{
-      position: "fixed",
-      top: "52vh",
-      right: "5vw",
-      transform: "translateY(-50%)",
-      background: "rgba(255, 255, 255, 0.0",
-      borderRadius: "12px",
-      boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
-      color: "rgba(255, 255, 255, 0.70)",
-      padding: "2rem 1.5rem",
-      zIndex: 9999,
-      pointerEvents: "auto",
-      minWidth: "220px"
-    }}>
+    <div className="orientation-picker-container">
       <h3 style={{ marginBottom: "1rem", fontSize: "1.1rem" }}>Cube Orientation</h3>
       <div className="curr-colors-text">
         (Current) Top: &nbsp; <p style={{ color: `${currentTop}` }}>{currentTop}</p> • Front: &nbsp; <p style={{ color: `${currentFront}` }}>{currentFront}</p>
